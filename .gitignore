@@ -1,3 +1,5 @@
 cmd/noti/noti
+cmd/noti/noti.exe
 .DS_Store
 *.swp
+.noti.yaml

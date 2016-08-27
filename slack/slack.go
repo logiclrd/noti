@@ -2,31 +2,26 @@ package slack
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
-
-	"github.com/variadico/noti"
 )
 
 const (
-	tokEnv  = "NOTI_SLACK_TOK"
-	destEnv = "NOTI_SLACK_DEST"
+	// ParseNone autoformats the text in messages less.
+	ParseNone = "none"
+	// ParseFull autoformats message text more, like creating hyperlinks
+	// automatically.
+	ParseFull = "full"
 
-	// API is the Slack API endpoint.
-	API = "https://slack.com/api/chat.postMessage"
+	// LinkNamesOn enables making usernames hyperlinks.
+	LinkNamesOn = 1
+	// LinkNamesOn disables making usernames hyperlinks.
+	LinkNamesOff = 0
+
+	postAPI = "https://slack.com/api/chat.postMessage"
 )
-
-var (
-	errNoTok  = noti.ConfigErrror{Env: tokEnv, Reason: "missing"}
-	errNoDest = noti.ConfigErrror{Env: destEnv, Reason: "missing"}
-)
-
-type configuration struct {
-	accessToken string
-	destination string
-}
 
 type apiResponse struct {
 	OK        bool   `json:"ok"`
@@ -46,39 +41,81 @@ type apiResponse struct {
 	Error string `json:"error"`
 }
 
-func envConfig(env noti.EnvGetter) (configuration, error) {
-	tok := env.Get(tokEnv)
-	if tok == "" {
-		return configuration{}, errNoTok
-	}
+type Notification struct {
+	// Token is a user's authentication token.
+	Token string
+	// Channel is a notification's destination. It can be a channel, private
+	// group, or username.
+	Channel string
+	// Text is the notification's message.
+	Text string
+	// Parse is the mode used to parse text.
+	Parse string
+	// LinkNames converts usernames into links.
+	LinkNames int
+	// Attachments are rich text snippets.
+	Attachments map[string]string
+	// UnfurlLinks attempts to expand a link to show a preview. Success depends
+	// on the webpage having the right markdown.
+	UnfurlLinks bool
+	// UnfurlMedia attempts to expand a link to show a preview. Success depends
+	// on the webpage having the right markdown.
+	UnfurlMedia bool
+	// Username given to bot. If AsUser is true, then message will try to be
+	// sent from the given user.
+	Username string
+	// AsUser attempt to send a message as the user in Username.
+	AsUser bool
+	// IconURL is a URL to set as the user icon.
+	IconURL string
+	// IconEmoji is an emoji to set as the user icon.
+	IconEmoji string
 
-	dest := env.Get(destEnv)
-	if dest == "" {
-		return configuration{}, errNoDest
-	}
+	client *http.Client
+}
 
-	return configuration{
-		accessToken: tok,
-		destination: dest,
-	}, nil
+func (n *Notification) SetClient(c *http.Client) {
+	n.client = c
+}
+
+func (n *Notification) Client() *http.Client {
+	return n.client
 }
 
 // Notify sends a message request to the Slack API.
-func Notify(n noti.Params) error {
-	config, err := envConfig(n.Config)
+func (n *Notification) Send() error {
+	if n.Token == "" {
+		return errors.New("missing authentication token")
+	}
+	if n.Channel == "" {
+		return errors.New("missing channel, group, or username destination")
+	}
+	if n.Text == "" {
+		return errors.New("missing message text")
+	}
+
+	attach, err := json.Marshal(n.Attachments)
 	if err != nil {
 		return err
 	}
 
 	vals := make(url.Values)
-	vals.Set("channel", config.destination)
-	vals.Set("icon_emoji", ":rocket:")
-	vals.Set("text", fmt.Sprintf("%s\n%s", n.Title, n.Message))
-	vals.Set("token", config.accessToken)
-	vals.Set("username", "noti")
+	vals.Set("token", n.Token)
+	vals.Set("channel", n.Channel)
+	vals.Set("text", n.Text)
+	vals.Set("parse", n.Parse)
+	vals.Set("link_names", fmt.Sprint(n.LinkNames))
+	vals.Set("attachments", string(attach))
+	vals.Set("unfurl_links", fmt.Sprintf("%t", n.UnfurlLinks))
+	vals.Set("unfurl_media", fmt.Sprintf("%t", n.UnfurlMedia))
+	vals.Set("username", n.Username)
+	vals.Set("as_user", fmt.Sprintf("%t", n.AsUser))
+	vals.Set("icon_url", n.IconURL)
+	vals.Set("icon_emoji", n.IconEmoji)
 
-	webClient := &http.Client{Timeout: 30 * time.Second}
-	resp, err := webClient.PostForm(n.API, vals)
+	// fmt.Println(vals)
+
+	resp, err := n.client.PostForm(postAPI, vals)
 	if err != nil {
 		return err
 	}
@@ -86,12 +123,16 @@ func Notify(n noti.Params) error {
 
 	var r apiResponse
 	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
-		return fmt.Errorf("decoding response: %s", err)
+		return err
 	}
 
 	if !r.OK {
-		return noti.APIError{Site: "Slack", Msg: r.Error}
+		return errors.New(r.Error)
 	}
 
 	return nil
+}
+
+func (n *Notification) SetMessage(m string) {
+	n.Text = m
 }

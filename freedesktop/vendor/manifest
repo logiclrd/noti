@@ -1,0 +1,13 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/godbus/dbus",
+			"repository": "https://github.com/godbus/dbus",
+			"vcs": "git",
+			"revision": "9998ce8520caaa4a287fa5122ecb5d1ca1aeaede",
+			"branch": "master",
+			"notests": true
+		}
+	]
+}

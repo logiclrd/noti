@@ -1,0 +1,13 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/variadico/yaml",
+			"repository": "https://github.com/variadico/yaml",
+			"vcs": "git",
+			"revision": "63333a9c03f8a312c01ba72f0298b0827ca95e1f",
+			"branch": "v2",
+			"notests": true
+		}
+	]
+}
