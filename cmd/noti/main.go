@@ -7,6 +7,7 @@ import (
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/cli/banner"
 	"github.com/variadico/noti/cmd/noti/cli/root"
+	"github.com/variadico/noti/cmd/noti/cli/slack"
 	"github.com/variadico/noti/cmd/noti/cli/speech"
 	"github.com/variadico/noti/cmd/noti/cli/version"
 )
@@ -23,6 +24,7 @@ func main() {
 		"version": version.NewCommand(),
 		"banner":  banner.NewCommand().(cli.Cmd),
 		"speech":  speech.NewCommand().(cli.Cmd),
+		"slack":   slack.NewCommand().(cli.Cmd),
 	}
 
 	if len(noti.Args()) == 0 {
