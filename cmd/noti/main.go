@@ -7,6 +7,7 @@ import (
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/cli/banner"
 	"github.com/variadico/noti/cmd/noti/cli/root"
+	"github.com/variadico/noti/cmd/noti/cli/speech"
 	"github.com/variadico/noti/cmd/noti/cli/version"
 )
 
@@ -21,6 +22,7 @@ func main() {
 	noti.Cmds = map[string]cli.Cmd{
 		"version": version.NewCommand(),
 		"banner":  banner.NewCommand().(cli.Cmd),
+		"speech":  speech.NewCommand().(cli.Cmd),
 	}
 
 	if len(noti.Args()) == 0 {
