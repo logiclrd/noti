@@ -18,7 +18,7 @@ const (
 func File() (Options, error) {
 	ds, err := dirs()
 	if err != nil {
-		return Options{}, err
+		return NewOptions(), err
 	}
 
 	var data []byte
@@ -29,10 +29,10 @@ func File() (Options, error) {
 		}
 	}
 	if err != nil {
-		return Options{}, fmt.Errorf("config not found in: %s", ds)
+		return NewOptions(), fmt.Errorf("config not found in: %s", ds)
 	}
 
-	var opts Options
+	opts := NewOptions()
 	if err := yaml.Unmarshal(data, &opts); err != nil {
 		return Options{}, err
 	}
