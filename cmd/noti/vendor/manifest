@@ -2,6 +2,14 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/variadico/vbs",
+			"repository": "https://github.com/variadico/vbs",
+			"vcs": "git",
+			"revision": "f0add40c87e122a61fb02bb842403c1d842cd6ca",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/variadico/yaml",
 			"repository": "https://github.com/variadico/yaml",
 			"vcs": "git",
