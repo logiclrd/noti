@@ -30,7 +30,7 @@ func (c *Command) Run() error {
 	c.v.Println("Running noti command")
 
 	if c.help {
-		fmt.Println("noti [-verbose -h -help] [notification type] [command]")
+		fmt.Println(helpText)
 		return nil
 	}
 
