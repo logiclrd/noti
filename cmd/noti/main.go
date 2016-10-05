@@ -44,7 +44,7 @@ func main() {
 		// Command is something like: noti foo ls
 		if err := cmd.Parse(noti.Args()[1:]); err != nil {
 			log.Println("Error:", err)
-			log.Fatalln("Try 'noti -help' for more information.")
+			log.Fatalf("Try 'noti %s -help' for more information.", noti.Args()[0])
 		}
 	} else {
 		// Command is something like: noti ls
