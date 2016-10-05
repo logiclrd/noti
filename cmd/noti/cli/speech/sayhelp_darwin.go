@@ -3,10 +3,16 @@ package speech
 var helpText = `noti speech [options] [command]
 
 OPTIONS
+    -m, -message
+        Notification message. Default is "Done!"
 
-	-m, -message
-	-rate
-	-voice
-	-verbose
-	-h, -help
+    -rate
+        Rate of speech.
+    -voice
+        Voice used to speak. Default is "Alex".
+
+    -verbose
+        Enable verbose mode.
+    -h, -help
+        Show help.
 `
