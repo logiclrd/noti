@@ -2,6 +2,7 @@ package cli
 
 import (
 	"flag"
+	"io/ioutil"
 
 	"github.com/variadico/noti/cmd/noti/run"
 )
@@ -18,6 +19,14 @@ type NotifyCmd interface {
 
 type Flags struct {
 	*flag.FlagSet
+}
+
+func NewFlags(name string) Flags {
+	set := flag.NewFlagSet(name, flag.ContinueOnError)
+	set.Usage = func() {} // We handle this ourselves.
+	set.SetOutput(ioutil.Discard)
+
+	return Flags{set}
 }
 
 // Set returns true if any of the given flags were passed by the user.

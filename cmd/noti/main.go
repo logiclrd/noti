@@ -17,7 +17,8 @@ func main() {
 
 	noti := root.NewCommand().(*root.Command)
 	if err := noti.Parse(os.Args[1:]); err != nil {
-		log.Fatalln("Error:", err)
+		log.Println("Error:", err)
+		log.Fatalln("Try 'noti -help' for more information.")
 	}
 
 	noti.Cmds = map[string]cli.Cmd{
@@ -42,7 +43,8 @@ func main() {
 	if found {
 		// Command is something like: noti foo ls
 		if err := cmd.Parse(noti.Args()[1:]); err != nil {
-			log.Fatalln("Error:", err)
+			log.Println("Error:", err)
+			log.Fatalln("Try 'noti -help' for more information.")
 		}
 	} else {
 		// Command is something like: noti ls

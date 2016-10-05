@@ -3,12 +3,20 @@ package banner
 var helpText = `noti banner [options] [command]
 
 OPTIONS
+    -t, -title
+        Notification title. Default is utility name.
+    -m, -message
+        Notification message. Default is "Done!"
 
-	-t, -title
-	-m, -message
-	-subtitle
-	-icon
-	-sound
-	-verbose
-	-h, -help
+    -subtitle
+        Notification subtitle.
+    -icon
+        Notification icon.
+    -sound
+        Notification sound.
+
+    -verbose
+        Enable verbose mode.
+    -h, -help
+        Show help.
 `

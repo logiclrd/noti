@@ -1,7 +1,6 @@
 package banner
 
 import (
-	"flag"
 	"fmt"
 
 	"github.com/variadico/noti/cmd/noti/cli"
@@ -109,7 +108,7 @@ func (c *Command) Run() error {
 
 func NewCommand() cli.NotifyCmd {
 	cmd := &Command{
-		flag: cli.Flags{flag.NewFlagSet("banner", flag.ExitOnError)},
+		flag: cli.NewFlags("banner"),
 		v:    vbs.New(),
 		n:    new(nsuser.Notification),
 	}
