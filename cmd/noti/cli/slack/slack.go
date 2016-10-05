@@ -1,7 +1,6 @@
 package slack
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 	"time"
@@ -68,37 +67,37 @@ func (c *Command) Notify(stats run.Stats) error {
 	}
 
 	fromFlags := new(slack.Notification)
-	if c.flag.Set("message", "m") {
+	if c.flag.Passed("message", "m") {
 		fromFlags.Text = c.n.Text
 	}
-	if c.flag.Set("token") {
+	if c.flag.Passed("token") {
 		fromFlags.Token = c.n.Token
 	}
-	if c.flag.Set("channel") {
+	if c.flag.Passed("channel") {
 		fromFlags.Channel = c.n.Channel
 	}
-	if c.flag.Set("parse") {
+	if c.flag.Passed("parse") {
 		fromFlags.Parse = c.n.Parse
 	}
-	if c.flag.Set("link-names") {
+	if c.flag.Passed("link-names") {
 		fromFlags.LinkNames = c.n.LinkNames
 	}
-	if c.flag.Set("unfurl-links") {
+	if c.flag.Passed("unfurl-links") {
 		fromFlags.UnfurlLinks = c.n.UnfurlLinks
 	}
-	if c.flag.Set("unfurl-media") {
+	if c.flag.Passed("unfurl-media") {
 		fromFlags.UnfurlMedia = c.n.UnfurlMedia
 	}
-	if c.flag.Set("username") {
+	if c.flag.Passed("username") {
 		fromFlags.Username = c.n.Username
 	}
-	if c.flag.Set("as-user") {
+	if c.flag.Passed("as-user") {
 		fromFlags.AsUser = c.n.AsUser
 	}
-	if c.flag.Set("icon-url") {
+	if c.flag.Passed("icon-url") {
 		fromFlags.IconURL = c.n.IconURL
 	}
-	if c.flag.Set("icon-emoji") {
+	if c.flag.Passed("icon-emoji") {
 		fromFlags.IconEmoji = c.n.IconEmoji
 	}
 
@@ -143,27 +142,26 @@ func (c *Command) Run() error {
 
 func NewCommand() cli.NotifyCmd {
 	cmd := &Command{
-		flag: cli.Flags{flag.NewFlagSet("slack", flag.ExitOnError)},
+		flag: cli.NewFlags("slack"),
 		v:    vbs.New(),
 		n:    new(slack.Notification),
 	}
 
-	cmd.flag.StringVar(&cmd.n.Token, "token", cmdDefault.Token, "Token (Required)")
-	cmd.flag.StringVar(&cmd.n.Channel, "channel", cmdDefault.Channel, "Channel (Required)")
-	cmd.flag.StringVar(&cmd.n.Text, "message", cmdDefault.Text, "Message")
-	cmd.flag.StringVar(&cmd.n.Text, "m", cmdDefault.Text, "Message")
-	cmd.flag.StringVar(&cmd.n.Parse, "parse", cmdDefault.Parse, "Parse")
-	cmd.flag.IntVar(&cmd.n.LinkNames, "link-names", cmdDefault.LinkNames, "LinkNames")
-	cmd.flag.BoolVar(&cmd.n.UnfurlLinks, "unfurl-links", cmdDefault.UnfurlLinks, "UnfurlLinks")
-	cmd.flag.BoolVar(&cmd.n.UnfurlMedia, "unfurl-media", cmdDefault.UnfurlMedia, "UnfurlMedia")
-	cmd.flag.StringVar(&cmd.n.Username, "username", cmdDefault.Username, "Username")
-	cmd.flag.BoolVar(&cmd.n.AsUser, "as-user", cmdDefault.AsUser, "AsUser")
-	cmd.flag.StringVar(&cmd.n.IconURL, "icon-url", cmdDefault.IconURL, "Username")
-	cmd.flag.StringVar(&cmd.n.IconEmoji, "icon-emoji", cmdDefault.IconEmoji, "IconEmoji")
+	cmd.flag.SetStrings(&cmd.n.Text, "m", "message", cmdDefault.Text)
 
-	cmd.flag.BoolVar(&cmd.v.Verbose, "verbose", false, "Enable verbose mode")
-	cmd.flag.BoolVar(&cmd.help, "h", false, "Show help")
-	cmd.flag.BoolVar(&cmd.help, "help", false, "Show help")
+	cmd.flag.SetString(&cmd.n.Token, "token", cmdDefault.Token)
+	cmd.flag.SetString(&cmd.n.Channel, "channel", cmdDefault.Channel)
+	cmd.flag.SetString(&cmd.n.Parse, "parse", cmdDefault.Parse)
+	cmd.flag.SetInt(&cmd.n.LinkNames, "link-names", cmdDefault.LinkNames)
+	cmd.flag.SetBool(&cmd.n.UnfurlLinks, "unfurl-links", cmdDefault.UnfurlLinks)
+	cmd.flag.SetBool(&cmd.n.UnfurlMedia, "unfurl-media", cmdDefault.UnfurlMedia)
+	cmd.flag.SetString(&cmd.n.Username, "username", cmdDefault.Username)
+	cmd.flag.SetBool(&cmd.n.AsUser, "as-user", cmdDefault.AsUser)
+	cmd.flag.SetString(&cmd.n.IconURL, "icon-url", cmdDefault.IconURL)
+	cmd.flag.SetString(&cmd.n.IconEmoji, "icon-emoji", cmdDefault.IconEmoji)
+
+	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
+	cmd.flag.SetBools(&cmd.help, "h", "help", false)
 
 	return cmd
 }

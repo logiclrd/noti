@@ -1,7 +1,6 @@
 package version
 
 import (
-	"flag"
 	"fmt"
 
 	"github.com/variadico/noti/cmd/noti/cli"
@@ -34,13 +33,12 @@ func (c *Command) Run() error {
 
 func NewCommand() cli.Cmd {
 	cmd := &Command{
-		flag: cli.Flags{flag.NewFlagSet("version", flag.ExitOnError)},
+		flag: cli.NewFlags("version"),
 		v:    vbs.New(),
 	}
 
-	cmd.flag.BoolVar(&cmd.v.Verbose, "verbose", false, "Enable verbose mode")
-	cmd.flag.BoolVar(&cmd.help, "h", false, "Show help")
-	cmd.flag.BoolVar(&cmd.help, "help", false, "Show help")
+	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
+	cmd.flag.SetBools(&cmd.help, "h", "help", false)
 
 	return cmd
 }

@@ -1,7 +1,6 @@
 package root
 
 import (
-	"flag"
 	"fmt"
 	"log"
 
@@ -79,13 +78,12 @@ func (c *Command) Notify(stats run.Stats) error {
 
 func NewCommand() cli.NotifyCmd {
 	cmd := &Command{
-		flag: cli.Flags{flag.NewFlagSet("noti", flag.ContinueOnError)},
+		flag: cli.NewFlags("noti"),
 		v:    vbs.New(),
 	}
 
-	cmd.flag.BoolVar(&cmd.v.Verbose, "verbose", false, "Enable verbose mode")
-	cmd.flag.BoolVar(&cmd.help, "h", false, "Show help")
-	cmd.flag.BoolVar(&cmd.help, "help", false, "Show help")
+	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
+	cmd.flag.SetBools(&cmd.help, "h", "help", false)
 
 	return cmd
 }

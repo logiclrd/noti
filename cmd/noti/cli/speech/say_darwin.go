@@ -1,7 +1,6 @@
 package speech
 
 import (
-	"flag"
 	"fmt"
 
 	"github.com/variadico/noti/cmd/noti/cli"
@@ -56,13 +55,13 @@ func (c *Command) Notify(stats run.Stats) error {
 
 	fromFlags := new(say.Notification)
 
-	if c.flag.Set("rate") {
+	if c.flag.Passed("rate") {
 		fromFlags.Rate = c.n.Rate
 	}
-	if c.flag.Set("message", "m") {
+	if c.flag.Passed("message", "m") {
 		fromFlags.Text = c.n.Text
 	}
-	if c.flag.Set("rate") {
+	if c.flag.Passed("rate") {
 		fromFlags.Rate = c.n.Rate
 	}
 
@@ -105,19 +104,18 @@ func (c *Command) Run() error {
 
 func NewCommand() cli.NotifyCmd {
 	cmd := &Command{
-		flag: cli.Flags{flag.NewFlagSet("speech", flag.ExitOnError)},
+		flag: cli.NewFlags("speech"),
 		v:    vbs.New(),
 		n:    new(say.Notification),
 	}
 
-	cmd.flag.StringVar(&cmd.n.Text, "message", cmdDefault.Text, "Message")
-	cmd.flag.StringVar(&cmd.n.Text, "m", cmdDefault.Text, "Message")
-	cmd.flag.StringVar(&cmd.n.Voice, "voice", cmdDefault.Voice, "Voice")
-	cmd.flag.IntVar(&cmd.n.Rate, "rate", cmdDefault.Rate, "Rate")
+	cmd.flag.SetStrings(&cmd.n.Text, "m", "message", cmdDefault.Text)
 
-	cmd.flag.BoolVar(&cmd.v.Verbose, "verbose", false, "Enable verbose mode")
-	cmd.flag.BoolVar(&cmd.help, "h", false, "Show help")
-	cmd.flag.BoolVar(&cmd.help, "help", false, "Show help")
+	cmd.flag.SetString(&cmd.n.Voice, "voice", cmdDefault.Voice)
+	cmd.flag.SetInt(&cmd.n.Rate, "rate", cmdDefault.Rate)
+
+	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
+	cmd.flag.SetBools(&cmd.help, "h", "help", false)
 
 	return cmd
 }

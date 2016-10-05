@@ -53,19 +53,19 @@ func (c *Command) Notify(stats run.Stats) error {
 
 	fromFlags := new(nsuser.Notification)
 
-	if c.flag.Set("title", "t") {
+	if c.flag.Passed("title", "t") {
 		fromFlags.Title = c.n.Title
 	}
-	if c.flag.Set("subtitle") {
+	if c.flag.Passed("subtitle") {
 		fromFlags.Subtitle = c.n.Subtitle
 	}
-	if c.flag.Set("message", "m") {
+	if c.flag.Passed("message", "m") {
 		fromFlags.InformativeText = c.n.InformativeText
 	}
-	if c.flag.Set("icon") {
+	if c.flag.Passed("icon") {
 		fromFlags.ContentImage = c.n.ContentImage
 	}
-	if c.flag.Set("sound") {
+	if c.flag.Passed("sound") {
 		fromFlags.SoundName = c.n.SoundName
 	}
 
@@ -113,17 +113,15 @@ func NewCommand() cli.NotifyCmd {
 		n:    new(nsuser.Notification),
 	}
 
-	cmd.flag.StringVar(&cmd.n.Title, "title", cmdDefault.Title, "Title")
-	cmd.flag.StringVar(&cmd.n.Title, "t", cmdDefault.Title, "Title")
-	cmd.flag.StringVar(&cmd.n.Subtitle, "subtitle", cmdDefault.Subtitle, "Subtitle")
-	cmd.flag.StringVar(&cmd.n.InformativeText, "message", cmdDefault.InformativeText, "Message")
-	cmd.flag.StringVar(&cmd.n.InformativeText, "m", cmdDefault.InformativeText, "Message")
-	cmd.flag.StringVar(&cmd.n.ContentImage, "icon", cmdDefault.ContentImage, "Icon")
-	cmd.flag.StringVar(&cmd.n.SoundName, "sound", cmdDefault.SoundName, "Sound")
+	cmd.flag.SetStrings(&cmd.n.Title, "t", "title", cmdDefault.Title)
+	cmd.flag.SetStrings(&cmd.n.InformativeText, "m", "message", cmdDefault.InformativeText)
 
-	cmd.flag.BoolVar(&cmd.v.Verbose, "verbose", false, "Enable verbose mode")
-	cmd.flag.BoolVar(&cmd.help, "h", false, "Show help")
-	cmd.flag.BoolVar(&cmd.help, "help", false, "Show help")
+	cmd.flag.SetString(&cmd.n.Subtitle, "subtitle", cmdDefault.Subtitle)
+	cmd.flag.SetString(&cmd.n.ContentImage, "icon", cmdDefault.ContentImage)
+	cmd.flag.SetString(&cmd.n.SoundName, "sound", cmdDefault.SoundName)
+
+	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
+	cmd.flag.SetBools(&cmd.help, "h", "help", false)
 
 	return cmd
 }
