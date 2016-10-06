@@ -5,12 +5,12 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"syscall"
 	"time"
 )
 
 const (
 	cmdNotFound = 127
+	noExitCode  = -1
 )
 
 type Stats struct {
@@ -19,57 +19,8 @@ type Stats struct {
 	// Stdout   string
 	// Stderr   string
 	ExitCode int
-	ExecErr  error
+	Err      error
 	Duration time.Duration
-}
-
-func Exec(args ...string) Stats {
-	if len(args) == 0 {
-		return Stats{
-			Cmd: "noti",
-		}
-	}
-
-	st := Stats{
-		Cmd:  args[0],
-		Args: args[1:],
-	}
-
-	if _, err := exec.LookPath(args[0]); err != nil {
-		// Before we run anything, we're going to check if we can find the
-		// command. If we can't find a command, then we'll assume it might be
-		// an aliased command.
-		expanded, expErr := expandAlias(args[0])
-		if expErr != nil {
-			st.ExitCode = cmdNotFound
-			st.ExecErr = err
-			return st
-		}
-
-		args = append(expanded, args[1:]...)
-	}
-
-	cmd := exec.Command(args[0], args[1:]...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	start := time.Now()
-	if err := cmd.Run(); err != nil {
-		st.Duration = time.Since(start)
-		st.ExecErr = err
-
-		if eerr, is := err.(*exec.ExitError); is {
-			if status, is := eerr.Sys().(syscall.WaitStatus); is {
-				st.ExitCode = status.ExitStatus()
-			}
-		}
-
-		return st
-	}
-	st.Duration = time.Since(start)
-
-	return st
 }
 
 // expandAlias attempts to expand an alias and return back the real command.

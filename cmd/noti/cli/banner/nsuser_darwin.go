@@ -2,6 +2,7 @@ package banner
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/config"
@@ -29,9 +30,10 @@ func ptrs(n *nsuser.Notification) []interface{} {
 type Command struct {
 	flag cli.Flags
 	v    vbs.Printer
-	help bool
+	n    *nsuser.Notification
 
-	n *nsuser.Notification
+	help    bool
+	timeout string
 }
 
 func (c *Command) Parse(args []string) error {
@@ -39,11 +41,6 @@ func (c *Command) Parse(args []string) error {
 }
 
 func (c *Command) Notify(stats run.Stats) error {
-	if c.help {
-		fmt.Println(helpText)
-		return nil
-	}
-
 	conf, err := config.File()
 	if err != nil {
 		c.v.Println(err)
@@ -98,11 +95,23 @@ func (c *Command) Notify(stats run.Stats) error {
 }
 
 func (c *Command) Run() error {
-	c.v.Println("Executing command")
-	stats := run.Exec(c.flag.Args()...)
-	c.v.Println("Executed command")
-	c.v.Printf("Run stats: %+v\n", stats)
+	if c.help {
+		fmt.Println(helpText)
+		return nil
+	}
 
+	if c.timeout == "" {
+		c.v.Println("Executing command")
+		return c.Notify(run.Exec(c.flag.Args()...))
+	}
+
+	d, err := time.ParseDuration(c.timeout)
+	if err != nil {
+		return err
+	}
+
+	c.v.Println("Executing command with timeout")
+	stats := run.ExecWithTimeout(d, c.flag.Args()...)
 	return c.Notify(stats)
 }
 
@@ -122,6 +131,8 @@ func NewCommand() cli.NotifyCmd {
 
 	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
 	cmd.flag.SetBools(&cmd.help, "h", "help", false)
+
+	cmd.flag.SetString(&cmd.timeout, "timeout", "")
 
 	return cmd
 }
