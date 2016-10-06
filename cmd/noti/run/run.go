@@ -1,9 +1,7 @@
 package run
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -16,10 +14,10 @@ const (
 )
 
 type Stats struct {
-	Cmd      string
-	Args     []string
-	Stdout   string
-	Stderr   string
+	Cmd  string
+	Args []string
+	// Stdout   string
+	// Stderr   string
 	ExitCode int
 	ExecErr  error
 	Duration time.Duration
@@ -53,15 +51,8 @@ func Exec(args ...string) Stats {
 
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Stdin = os.Stdin
-	// cmd.Stdout = os.Stdout
-	// cmd.Stderr = os.Stderr
-
-	// Should this be conditional? This could grow large if noti is watching a
-	// long running process or one that outputs a lot.
-	out2 := new(bytes.Buffer)
-	err2 := new(bytes.Buffer)
-	cmd.Stdout = io.MultiWriter(os.Stdout, out2)
-	cmd.Stderr = io.MultiWriter(os.Stderr, err2)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	start := time.Now()
 	if err := cmd.Run(); err != nil {
@@ -77,8 +68,6 @@ func Exec(args ...string) Stats {
 		return st
 	}
 	st.Duration = time.Since(start)
-	st.Stdout = out2.String()
-	st.Stderr = err2.String()
 
 	return st
 }

@@ -79,13 +79,12 @@ void Send(const char *title, const char *subtitle, const char *informativeText, 
 
         NSLog(@"Entering wait loop");
 		int i = 0;
-        // while (ncDelegate.keepRunning) {
-			NSLog(@"iteration: %d", i);
+        while (ncDelegate.keepRunning) {
             [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
 			i++;
 			if (i > 1000) {
-				// break;
+				break;
 			}
-        // }
+        }
     }
 }
