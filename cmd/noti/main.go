@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/cli/banner"
@@ -14,6 +15,13 @@ import (
 
 func main() {
 	log.SetFlags(0)
+
+	if len(os.Args) == 1 {
+		p, err := exec.LookPath("noti")
+		if err == nil && os.Args[0] == p {
+			return
+		}
+	}
 
 	noti := root.NewCommand().(*root.Command)
 	if err := noti.Parse(os.Args[1:]); err != nil {
