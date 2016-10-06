@@ -1,6 +1,7 @@
 package banner
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -32,8 +33,9 @@ type Command struct {
 	v    vbs.Printer
 	n    *nsuser.Notification
 
-	help    bool
-	timeout string
+	help     bool
+	ktimeout string
+	timeout  string
 }
 
 func (c *Command) Parse(args []string) error {
@@ -100,19 +102,38 @@ func (c *Command) Run() error {
 		return nil
 	}
 
-	if c.timeout == "" {
+	// Maybe we don't want to kill the process after the timeout.
+	// Maybe just send the notification, but keep the process running.
+
+	if c.ktimeout == "" && c.timeout == "" {
 		c.v.Println("Executing command")
 		return c.Notify(run.Exec(c.flag.Args()...))
+	} else if c.ktimeout != "" {
+		d, err := time.ParseDuration(c.ktimeout)
+		if err != nil {
+			return err
+		}
+
+		c.v.Println("Executing command with timeout")
+		stats := run.ExecWithTimeout(d, c.flag.Args()...)
+		return c.Notify(stats)
 	}
 
-	d, err := time.ParseDuration(c.timeout)
-	if err != nil {
-		return err
+	// -timeout was set!
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	stats := run.ExecNotify(ctx, c.flag.Args()...)
+	for s := range stats {
+		fmt.Println(">>>>>>>> SENDING NOTI!")
+		err := c.Notify(s)
+		if err != nil {
+			return err
+		}
 	}
 
-	c.v.Println("Executing command with timeout")
-	stats := run.ExecWithTimeout(d, c.flag.Args()...)
-	return c.Notify(stats)
+	return nil
 }
 
 func NewCommand() cli.NotifyCmd {
@@ -132,6 +153,7 @@ func NewCommand() cli.NotifyCmd {
 	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
 	cmd.flag.SetBools(&cmd.help, "h", "help", false)
 
+	cmd.flag.SetString(&cmd.ktimeout, "ktimeout", "")
 	cmd.flag.SetString(&cmd.timeout, "timeout", "")
 
 	return cmd

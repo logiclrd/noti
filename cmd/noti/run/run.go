@@ -21,6 +21,7 @@ type Stats struct {
 	ExitCode int
 	Err      error
 	Duration time.Duration
+	State    string
 }
 
 // expandAlias attempts to expand an alias and return back the real command.
