@@ -1,9 +1,11 @@
 package run
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"syscall"
@@ -199,6 +201,100 @@ func execNotify(ctx context.Context, out chan Stats, args []string) {
 			sts.Duration = time.Since(start)
 			sts.State = "running"
 			out <- sts
+		}
+	}
+}
+
+// ExecContains
+func ExecContains(ctx context.Context, args ...string) chan Stats {
+	out := make(chan Stats)
+	go execContains(ctx, out, args)
+	return out
+}
+
+type scanWriter struct {
+	target []byte
+	found  bool
+	out    io.Writer
+}
+
+func (s *scanWriter) Write(p []byte) (int, error) {
+	s.found = bytes.Contains(p, s.target)
+	return fmt.Fprint(s.out, string(p))
+}
+
+func execContains(ctx context.Context, out chan Stats, args []string) {
+	defer close(out)
+
+	if len(args) == 0 {
+		out <- Stats{
+			Cmd: "noti",
+		}
+		return
+	}
+
+	sts := Stats{
+		Cmd:      args[0],
+		Args:     args[1:],
+		ExitCode: -1,
+	}
+
+	if _, err := exec.LookPath(args[0]); err != nil {
+		// Before we run anything, we're going to check if we can find the
+		// command. If we can't find a command, then we'll assume it might be
+		// an aliased command.
+		expanded, expErr := expandAlias(args[0])
+		if expErr != nil {
+			sts.ExitCode = cmdNotFound
+			sts.Err = err
+			out <- sts
+			return
+		}
+
+		args = append(expanded, args[1:]...)
+	}
+
+	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
+	cmd.Stdin = os.Stdin
+
+	scanStdout := &scanWriter{out: os.Stdout, target: []byte("FIND THIS")}
+	scanStderr := &scanWriter{out: os.Stderr, target: []byte("FIND THIS")}
+	cmd.Stdout = scanStdout
+	cmd.Stderr = scanStderr
+
+	start := time.Now()
+	errc := make(chan error)
+	go func() { errc <- cmd.Run() }()
+
+	fmt.Println(">>>>>>>> WAIT LOOP!")
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println(">>>>>>>> CONTEXT CANCELLED!")
+			sts.Duration = time.Since(start)
+			out <- sts
+			return
+		case err := <-errc:
+			fmt.Println(">>>>>>>> COMMAND FINISHED!")
+			sts.Duration = time.Since(start)
+			sts.Err = err
+			if eerr, is := err.(*exec.ExitError); is {
+				if status, is := eerr.Sys().(syscall.WaitStatus); is {
+					sts.ExitCode = status.ExitStatus()
+				}
+			}
+			sts.State = "done"
+			out <- sts
+			return
+		default:
+			sts.Duration = time.Since(start)
+			sts.State = "running"
+
+			if scanStdout.found || scanStderr.found {
+				out <- sts
+				scanStdout.found = false
+				scanStderr.found = false
+			}
 		}
 	}
 }

@@ -38,6 +38,7 @@ type Command struct {
 	help     bool
 	ktimeout string
 	timeout  string
+	contains string
 }
 
 func (c *Command) Parse(args []string) error {
@@ -93,40 +94,60 @@ func (c *Command) Notify(stats run.Stats) error {
 }
 
 func (c *Command) Run() error {
+	fmt.Println(">>>>>>>>  RUNNING SAY!")
+
 	if c.help {
 		fmt.Println(helpText)
 		return nil
 	}
 
-	if c.ktimeout == "" && c.timeout == "" {
-		c.v.Println("Executing command")
-		return c.Notify(run.Exec(c.flag.Args()...))
-	} else if c.ktimeout != "" {
+	if c.ktimeout != "" {
 		d, err := time.ParseDuration(c.ktimeout)
 		if err != nil {
 			return err
 		}
 
+		fmt.Println(">>>>>>>> EXEC TIMEOUT!")
 		c.v.Println("Executing command with timeout")
 		stats := run.ExecWithTimeout(d, c.flag.Args()...)
 		return c.Notify(stats)
 	}
 
-	// -timeout was set!
+	if c.timeout != "" {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	stats := run.ExecNotify(ctx, c.flag.Args()...)
-	for s := range stats {
-		fmt.Println(">>>>>>>> SENDING NOTI!")
-		err := c.Notify(s)
-		if err != nil {
-			return err
+		fmt.Println(">>>>>>>> EXEC NOTIFY!")
+		stats := run.ExecNotify(ctx, c.flag.Args()...)
+		for s := range stats {
+			fmt.Println(">>>>>>>> SENDING NOTI!")
+			err := c.Notify(s)
+			if err != nil {
+				return err
+			}
 		}
+		return nil
 	}
 
-	return nil
+	if c.contains != "" {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
+		fmt.Println(">>>>>>>> EXEC CONTAINS!")
+		stats := run.ExecContains(ctx, c.flag.Args()...)
+		for s := range stats {
+			fmt.Println(">>>>>>>> SENDING NOTI!")
+			err := c.Notify(s)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	c.v.Println("Executing command")
+	fmt.Println(">>>>>>>>  EXEC!")
+	return c.Notify(run.Exec(c.flag.Args()...))
 }
 
 func NewCommand() cli.NotifyCmd {
@@ -146,6 +167,7 @@ func NewCommand() cli.NotifyCmd {
 
 	cmd.flag.SetString(&cmd.ktimeout, "ktimeout", "")
 	cmd.flag.SetString(&cmd.timeout, "timeout", "")
+	cmd.flag.SetString(&cmd.contains, "contains", "")
 
 	return cmd
 }
