@@ -9,10 +9,7 @@ package nsuser
 #import "nsuser_darwin.h"
 */
 import "C"
-import (
-	"runtime"
-	"unsafe"
-)
+import "unsafe"
 
 type Notification struct {
 	Title    string
@@ -38,9 +35,7 @@ func (n *Notification) Send() error {
 	defer C.free(unsafe.Pointer(c))
 	defer C.free(unsafe.Pointer(sn))
 
-	runtime.LockOSThread()
 	C.Send(t, s, i, c, sn)
-	runtime.UnlockOSThread()
 
 	return nil
 }
