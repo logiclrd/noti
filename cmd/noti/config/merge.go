@@ -13,7 +13,7 @@ func MergeFields(a ...interface{}) error {
 	}
 
 	for i := 1; i < ln; i++ {
-		if err := mergePointers(a[0], a[i]); err != nil {
+		if err := merge(a[0], a[i]); err != nil {
 			return err
 		}
 	}
@@ -21,7 +21,7 @@ func MergeFields(a ...interface{}) error {
 	return nil
 }
 
-func mergePointers(n1, n2 interface{}) error {
+func merge(n1, n2 interface{}) error {
 	a := reflect.ValueOf(n1)
 	if err := validateType(a); err != nil {
 		return err
