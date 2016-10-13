@@ -18,18 +18,6 @@ var cmdDefault = &say.Notification{
 	Rate:  200,
 }
 
-func ptrs(n *say.Notification) []interface{} {
-	if n == nil {
-		return nil
-	}
-
-	return []interface{}{
-		&n.Text,
-		&n.Voice,
-		&n.Rate,
-	}
-}
-
 type Command struct {
 	flag cli.Flags
 	v    vbs.Printer
@@ -77,10 +65,10 @@ func (c *Command) Notify(stats run.Stats) error {
 	c.v.Println("Merging")
 	merged := new(say.Notification)
 	err = config.MergeFields(
-		ptrs(merged),
-		ptrs(cmdDefault),
-		ptrs(conf.Speech),
-		ptrs(fromFlags),
+		merged,
+		cmdDefault,
+		conf.Speech,
+		fromFlags,
 	)
 	if err != nil {
 		return err

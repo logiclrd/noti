@@ -21,26 +21,6 @@ var cmdDefault = &slack.Notification{
 	Username:    "Noti",
 }
 
-func ptrs(n *slack.Notification) []interface{} {
-	if n == nil {
-		return nil
-	}
-
-	return []interface{}{
-		&n.Token,
-		&n.Channel,
-		&n.Text,
-		&n.Parse,
-		&n.LinkNames,
-		&n.UnfurlLinks,
-		&n.UnfurlMedia,
-		&n.Username,
-		&n.AsUser,
-		&n.IconURL,
-		&n.IconEmoji,
-	}
-}
-
 type Command struct {
 	flag cli.Flags
 	v    vbs.Printer
@@ -113,10 +93,10 @@ func (c *Command) Notify(stats run.Stats) error {
 	c.v.Println("Merging")
 	merged := new(slack.Notification)
 	err = config.MergeFields(
-		ptrs(merged),
-		ptrs(cmdDefault),
-		ptrs(conf.Slack),
-		ptrs(fromFlags),
+		merged,
+		cmdDefault,
+		conf.Slack,
+		fromFlags,
 	)
 	if err != nil {
 		return err

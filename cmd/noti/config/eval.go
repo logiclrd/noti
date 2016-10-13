@@ -2,7 +2,6 @@ package config
 
 import (
 	"bytes"
-	"errors"
 	"reflect"
 	"text/template"
 
@@ -14,12 +13,8 @@ import (
 func EvalStringFields(n interface{}, st run.Stats) error {
 	// Grab underlying value of n.
 	v := reflect.ValueOf(n)
-
-	if v.Kind() != reflect.Ptr {
-		return errors.New("notification must be pointer type")
-	}
-	if v.IsNil() {
-		return errors.New("notification must be non-nil pointer type")
+	if err := validateType(v); err != nil {
+		return err
 	}
 
 	// Grab the element at pointer address.

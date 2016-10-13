@@ -8,24 +8,14 @@ import (
 )
 
 func TestMergeFields(t *testing.T) {
-	ptrs := func(n *nsuser.Notification) []interface{} {
-		return []interface{}{
-			&n.Title,
-			&n.Subtitle,
-			&n.InformativeText,
-			&n.ContentImage,
-			&n.SoundName,
-		}
-	}
-
 	blank := new(nsuser.Notification)
 	preset := &nsuser.Notification{
 		Title:           "testing",
 		InformativeText: "hello",
 	}
 
-	if err := MergeFields(ptrs(blank), ptrs(preset)); err != nil {
-		t.Errorf("Unexpected error: %s", err)
+	if err := MergeFields(blank, preset); err != nil {
+		t.Fatalf("Unexpected error: %s", err)
 	}
 
 	if !reflect.DeepEqual(blank, preset) {

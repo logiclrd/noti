@@ -2,12 +2,10 @@ package config
 
 import (
 	"errors"
-	"fmt"
-	"log"
-	"runtime"
+	"reflect"
 )
 
-func MergeFields(a ...[]interface{}) error {
+func MergeFields(a ...interface{}) error {
 	ln := len(a)
 
 	if ln < 2 {
@@ -23,47 +21,60 @@ func MergeFields(a ...[]interface{}) error {
 	return nil
 }
 
-func mergePointers(a, b []interface{}) (err error) {
-	if len(a) != len(b) {
-		return errors.New("merge slice length mismatch")
+func mergePointers(n1, n2 interface{}) error {
+	a := reflect.ValueOf(n1)
+	if err := validateType(a); err != nil {
+		return err
 	}
-	ln := len(a)
 
-	defer func() {
-		switch v := recover().(type) {
-		case *runtime.TypeAssertionError:
-			err = errors.New("merge type mismatch")
-		case error:
-			err = v
-		case nil:
-			// Carry on. Nothing to see here.
-		default:
-			log.Println(`IDK. ¯\_(ツ)_/¯`)
-			panic(v)
-		}
-	}()
+	b := reflect.ValueOf(n2)
+	if err := validateType(b); err != nil {
+		return err
+	}
+
+	// Grab struct at pointers.
+	a = a.Elem()
+	b = b.Elem()
+	if !a.CanSet() || !b.CanSet() {
+		return errors.New("notification is non-addressable")
+	}
+
+	ln := a.NumField()
+	if ln != b.NumField() {
+		return errors.New("fields number mismatch")
+	}
 
 	for i := 0; i < ln; i++ {
-		switch v := a[i].(type) {
-		case *string:
-			if *b[i].(*string) != "" {
-				*a[i].(*string) = *b[i].(*string)
+		switch a.Field(i).Kind() {
+		case reflect.String:
+			if v := b.Field(i).String(); v != "" {
+				a.Field(i).SetString(v)
 			}
-		case *int:
-			if *b[i].(*int) != 0 {
-				*a[i].(*int) = *b[i].(*int)
+		case reflect.Int:
+			if v := b.Field(i).Int(); v != 0 {
+				a.Field(i).SetInt(v)
 			}
-		case *float64:
-			if *b[i].(*float64) != 0.0 {
-				*a[i].(*float64) = *b[i].(*float64)
+		case reflect.Float64:
+			if v := b.Field(i).Float(); v != 0.0 {
+				a.Field(i).SetFloat(v)
 			}
-		case *bool:
-			if *b[i].(*bool) != false {
-				*a[i].(*bool) = *b[i].(*bool)
+		case reflect.Bool:
+			if v := b.Field(i).Bool(); v != false {
+				a.Field(i).SetBool(v)
 			}
-		default:
-			return fmt.Errorf("unsupported merge type: %T", v)
 		}
+	}
+
+	return nil
+}
+
+func validateType(v reflect.Value) error {
+	if v.Kind() != reflect.Ptr {
+		return errors.New("notification must be pointer type")
+	}
+
+	if v.IsNil() {
+		return errors.New("notification must be non-nil pointer type")
 	}
 
 	return nil

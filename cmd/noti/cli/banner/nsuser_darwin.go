@@ -19,16 +19,6 @@ var cmdDefault = &nsuser.Notification{
 	SoundName:       "Ping",
 }
 
-func ptrs(n *nsuser.Notification) []interface{} {
-	return []interface{}{
-		&n.Title,
-		&n.Subtitle,
-		&n.InformativeText,
-		&n.ContentImage,
-		&n.SoundName,
-	}
-}
-
 type Command struct {
 	flag cli.Flags
 	v    vbs.Printer
@@ -82,10 +72,10 @@ func (c *Command) Notify(stats run.Stats) error {
 	c.v.Println("Merging")
 	merged := new(nsuser.Notification)
 	err = config.MergeFields(
-		ptrs(merged),
-		ptrs(cmdDefault),
-		ptrs(conf.Banner),
-		ptrs(fromFlags),
+		merged,
+		cmdDefault,
+		conf.Banner,
+		fromFlags,
 	)
 	if err != nil {
 		return err
