@@ -106,9 +106,9 @@ func (c *Command) Notify(stats run.Stats) error {
 	c.v.Printf("Config: %+v\n", conf.Slack)
 	c.v.Printf("Flags: %+v\n", fromFlags)
 
-	config.EvalFields(ptrs(cmdDefault), stats)
-	config.EvalFields(ptrs(conf.Slack), stats)
-	config.EvalFields(ptrs(fromFlags), stats)
+	config.EvalFields(cmdDefault, stats)
+	config.EvalFields(conf.Slack, stats)
+	config.EvalFields(fromFlags, stats)
 
 	c.v.Println("Merging")
 	merged := new(slack.Notification)

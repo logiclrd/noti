@@ -19,12 +19,7 @@ func TestEvalFields(t *testing.T) {
 		Num:   42,
 	}
 
-	ptrs := []interface{}{
-		&s.Title,
-		&s.Num,
-	}
-
-	if err := EvalFields(ptrs, st); err != nil {
+	if err := EvalFields(&s, st); err != nil {
 		t.Errorf("Unexpected error: %s", err)
 	}
 

@@ -2,25 +2,41 @@ package config
 
 import (
 	"bytes"
+	"errors"
+	"reflect"
 	"text/template"
 
 	"github.com/variadico/noti/cmd/noti/run"
 )
 
-// EvalFields evaluates string fields as a text template.
-func EvalFields(fs []interface{}, st run.Stats) error {
-	var err error
+// EvalFields evaluates string fields as a text template. n should be
+// a non-nil pointer type. It will be modified.
+func EvalFields(n interface{}, st run.Stats) error {
+	// Grab underlying value of n.
+	v := reflect.ValueOf(n)
 
-	for _, field := range fs {
-		strField, is := field.(*string)
-		if !is {
+	if v.Kind() != reflect.Ptr {
+		return errors.New("notification must be pointer type")
+	}
+	if v.IsNil() {
+		return errors.New("notification must be non-nil pointer type")
+	}
+
+	// Grab the element at pointer address.
+	v = v.Elem()
+
+	var s string
+	var err error
+	for i := 0; i < v.NumField(); i++ {
+		if v.Field(i).Kind() != reflect.String {
 			continue
 		}
 
-		*strField, err = eval(*strField, st)
+		s, err = eval(v.Field(i).String(), st)
 		if err != nil {
 			return err
 		}
+		v.Field(i).SetString(s)
 	}
 
 	return nil
