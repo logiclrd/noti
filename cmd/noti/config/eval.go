@@ -11,7 +11,7 @@ import (
 
 // EvalFields evaluates string fields as a text template. n should be
 // a non-nil pointer type. It will be modified.
-func EvalFields(n interface{}, st run.Stats) error {
+func EvalStringFields(n interface{}, st run.Stats) error {
 	// Grab underlying value of n.
 	v := reflect.ValueOf(n)
 

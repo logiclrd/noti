@@ -75,9 +75,9 @@ func (c *Command) Notify(stats run.Stats) error {
 	c.v.Printf("Config: %+v\n", conf.Banner)
 	c.v.Printf("Flags: %+v\n", fromFlags)
 
-	config.EvalFields(cmdDefault, stats)
-	config.EvalFields(conf.Banner, stats)
-	config.EvalFields(fromFlags, stats)
+	config.EvalStringFields(cmdDefault, stats)
+	config.EvalStringFields(conf.Banner, stats)
+	config.EvalStringFields(fromFlags, stats)
 
 	c.v.Println("Merging")
 	merged := new(nsuser.Notification)

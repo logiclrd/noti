@@ -70,9 +70,9 @@ func (c *Command) Notify(stats run.Stats) error {
 	c.v.Printf("Config: %+v\n", conf.Speech)
 	c.v.Printf("Flags: %+v\n", fromFlags)
 
-	config.EvalFields(cmdDefault, stats)
-	config.EvalFields(conf.Speech, stats)
-	config.EvalFields(fromFlags, stats)
+	config.EvalStringFields(cmdDefault, stats)
+	config.EvalStringFields(conf.Speech, stats)
+	config.EvalStringFields(fromFlags, stats)
 
 	c.v.Println("Merging")
 	merged := new(say.Notification)

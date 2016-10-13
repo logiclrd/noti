@@ -6,7 +6,7 @@ import (
 	"github.com/variadico/noti/cmd/noti/run"
 )
 
-func TestEvalFields(t *testing.T) {
+func TestEvalStringFields(t *testing.T) {
 	st := run.Stats{
 		Cmd: "testing",
 	}
@@ -19,7 +19,7 @@ func TestEvalFields(t *testing.T) {
 		Num:   42,
 	}
 
-	if err := EvalFields(&s, st); err != nil {
+	if err := EvalStringFields(&s, st); err != nil {
 		t.Errorf("Unexpected error: %s", err)
 	}
 
