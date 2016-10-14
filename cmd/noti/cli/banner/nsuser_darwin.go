@@ -112,8 +112,12 @@ func (c *Command) Run() error {
 		return nil
 	}
 
-	c.v.Println("Trigger: exit")
-	return c.Notify(run.Exec(c.flag.Args()...))
+	if c.flag.Texit {
+		c.v.Println("Trigger: exit")
+		return c.Notify(run.Exec(c.flag.Args()...))
+	}
+
+	return nil
 }
 
 func NewCommand() cli.NotifyCmd {
