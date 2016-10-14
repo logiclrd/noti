@@ -1,9 +1,7 @@
 package speech
 
 import (
-	"context"
 	"fmt"
-	"time"
 
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/config"
@@ -93,52 +91,6 @@ func (c *Command) Run() error {
 		return nil
 	}
 
-	if c.ktimeout != "" {
-		d, err := time.ParseDuration(c.ktimeout)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(">>>>>>>> EXEC TIMEOUT!")
-		c.v.Println("Executing command with timeout")
-		stats := run.ExecWithTimeout(d, c.flag.Args()...)
-		return c.Notify(stats)
-	}
-
-	if c.timeout != "" {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-
-		fmt.Println(">>>>>>>> EXEC NOTIFY!")
-		stats := run.ExecNotify(ctx, c.flag.Args()...)
-		for s := range stats {
-			fmt.Println(">>>>>>>> SENDING NOTI!")
-			err := c.Notify(s)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-
-	if c.contains != "" {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-
-		fmt.Println(">>>>>>>> EXEC CONTAINS!")
-		stats := run.ExecContains(ctx, c.flag.Args()...)
-		for s := range stats {
-			fmt.Println(">>>>>>>> SENDING NOTI!")
-			err := c.Notify(s)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-
-	c.v.Println("Executing command")
-	fmt.Println(">>>>>>>>  EXEC!")
 	return c.Notify(run.Exec(c.flag.Args()...))
 }
 

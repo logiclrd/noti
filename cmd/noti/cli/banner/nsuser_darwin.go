@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"runtime"
-	"time"
 
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/config"
@@ -23,10 +22,6 @@ type Command struct {
 	flag *cli.Flags
 	v    vbs.Printer
 	n    *nsuser.Notification
-
-	ktimeout string
-	timeout  string
-	contains string
 }
 
 func (c *Command) Parse(args []string) error {
@@ -101,26 +96,14 @@ func (c *Command) Run() error {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	if c.ktimeout != "" {
-		d, err := time.ParseDuration(c.ktimeout)
-		if err != nil {
-			return err
-		}
+	// Used to cancel exec in case of notify failure.
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-		fmt.Println(">>>>>>>> EXEC TIMEOUT!")
-		c.v.Println("Executing command with timeout")
-		stats := run.ExecWithTimeout(d, c.flag.Args()...)
-		return c.Notify(stats)
-	}
-
-	if c.timeout != "" {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-
-		fmt.Println(">>>>>>>> EXEC NOTIFY!")
-		stats := run.ExecNotify(ctx, c.flag.Args()...)
+	if target := c.flag.Tcontains; target != "" {
+		c.v.Println("Trigger: contains")
+		stats := run.ExecContains(ctx, target, c.flag.Args()...)
 		for s := range stats {
-			fmt.Println(">>>>>>>> SENDING NOTI!")
 			err := c.Notify(s)
 			if err != nil {
 				return err
@@ -129,24 +112,7 @@ func (c *Command) Run() error {
 		return nil
 	}
 
-	if c.contains != "" {
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-
-		fmt.Println(">>>>>>>> EXEC CONTAINS!")
-		stats := run.ExecContains(ctx, c.flag.Args()...)
-		for s := range stats {
-			fmt.Println(">>>>>>>> SENDING NOTI!")
-			err := c.Notify(s)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-
-	c.v.Println("Executing command")
-	fmt.Println(">>>>>>>>  EXEC!")
+	c.v.Println("Trigger: exit")
 	return c.Notify(run.Exec(c.flag.Args()...))
 }
 
@@ -163,10 +129,6 @@ func NewCommand() cli.NotifyCmd {
 	cmd.flag.SetString(&cmd.n.Subtitle, "subtitle", cmdDefault.Subtitle)
 	cmd.flag.SetString(&cmd.n.ContentImage, "icon", cmdDefault.ContentImage)
 	cmd.flag.SetString(&cmd.n.SoundName, "sound", cmdDefault.SoundName)
-
-	cmd.flag.SetString(&cmd.ktimeout, "ktimeout", "")
-	cmd.flag.SetString(&cmd.timeout, "timeout", "")
-	cmd.flag.SetString(&cmd.contains, "contains", "")
 
 	return cmd
 }

@@ -10,6 +10,9 @@ type Flags struct {
 
 	Help    bool
 	Verbose bool
+
+	Texit     bool
+	Tcontains string
 }
 
 func NewFlags(name string) *Flags {
@@ -19,8 +22,11 @@ func NewFlags(name string) *Flags {
 
 	fs := new(Flags)
 	fs.FlagSet = set
+
 	fs.SetBools(&fs.Help, "h", "help", false)
 	fs.SetBools(&fs.Verbose, "v", "verbose", false)
+	fs.SetBool(&fs.Texit, "texit", true)
+	fs.SetString(&fs.Tcontains, "tcontains", "")
 
 	return fs
 }
