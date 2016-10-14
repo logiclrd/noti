@@ -29,7 +29,12 @@ type Command struct {
 }
 
 func (c *Command) Parse(args []string) error {
-	return c.flag.Parse(args)
+	if err := c.flag.Parse(args); err != nil {
+		return err
+	}
+
+	c.v.Verbose = c.flag.Verbose
+	return nil
 }
 
 func (c *Command) Notify(stats run.Stats) error {
@@ -138,8 +143,6 @@ func NewCommand() cli.NotifyCmd {
 	cmd.flag.SetBool(&cmd.n.AsUser, "as-user", cmdDefault.AsUser)
 	cmd.flag.SetString(&cmd.n.IconURL, "icon-url", cmdDefault.IconURL)
 	cmd.flag.SetString(&cmd.n.IconEmoji, "icon-emoji", cmdDefault.IconEmoji)
-
-	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
 
 	return cmd
 }

@@ -30,7 +30,12 @@ type Command struct {
 }
 
 func (c *Command) Parse(args []string) error {
-	return c.flag.Parse(args)
+	if err := c.flag.Parse(args); err != nil {
+		return err
+	}
+
+	c.v.Verbose = c.flag.Verbose
+	return nil
 }
 
 func (c *Command) Notify(stats run.Stats) error {
@@ -158,8 +163,6 @@ func NewCommand() cli.NotifyCmd {
 	cmd.flag.SetString(&cmd.n.Subtitle, "subtitle", cmdDefault.Subtitle)
 	cmd.flag.SetString(&cmd.n.ContentImage, "icon", cmdDefault.ContentImage)
 	cmd.flag.SetString(&cmd.n.SoundName, "sound", cmdDefault.SoundName)
-
-	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
 
 	cmd.flag.SetString(&cmd.ktimeout, "ktimeout", "")
 	cmd.flag.SetString(&cmd.timeout, "timeout", "")

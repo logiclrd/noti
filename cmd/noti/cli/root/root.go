@@ -22,7 +22,12 @@ func (c *Command) Args() []string {
 }
 
 func (c *Command) Parse(args []string) error {
-	return c.flag.Parse(args)
+	if err := c.flag.Parse(args); err != nil {
+		return err
+	}
+
+	c.v.Verbose = c.flag.Verbose
+	return nil
 }
 
 func (c *Command) Run() error {
@@ -80,8 +85,6 @@ func NewCommand() cli.NotifyCmd {
 		flag: cli.NewFlags("noti"),
 		v:    vbs.New(),
 	}
-
-	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
 
 	return cmd
 }

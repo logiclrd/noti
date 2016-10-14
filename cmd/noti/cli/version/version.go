@@ -13,7 +13,12 @@ type Command struct {
 }
 
 func (c *Command) Parse(args []string) error {
-	return c.flag.Parse(args)
+	if err := c.flag.Parse(args); err != nil {
+		return err
+	}
+
+	c.v.Verbose = c.flag.Verbose
+	return nil
 }
 
 func (c *Command) Run() error {
@@ -35,8 +40,6 @@ func NewCommand() cli.Cmd {
 		flag: cli.NewFlags("version"),
 		v:    vbs.New(),
 	}
-
-	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
 
 	return cmd
 }

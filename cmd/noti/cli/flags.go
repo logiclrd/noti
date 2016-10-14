@@ -8,7 +8,8 @@ import (
 type Flags struct {
 	*flag.FlagSet
 
-	Help bool
+	Help    bool
+	Verbose bool
 }
 
 func NewFlags(name string) *Flags {
@@ -19,6 +20,7 @@ func NewFlags(name string) *Flags {
 	fs := new(Flags)
 	fs.FlagSet = set
 	fs.SetBools(&fs.Help, "h", "help", false)
+	fs.SetBools(&fs.Verbose, "v", "verbose", false)
 
 	return fs
 }
