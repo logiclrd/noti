@@ -7,45 +7,51 @@ import (
 
 type Flags struct {
 	*flag.FlagSet
+
+	Help bool
 }
 
-func NewFlags(name string) Flags {
+func NewFlags(name string) *Flags {
 	set := flag.NewFlagSet(name, flag.ContinueOnError)
 	set.Usage = func() {} // We handle this ourselves.
 	set.SetOutput(ioutil.Discard)
 
-	return Flags{set}
+	fs := new(Flags)
+	fs.FlagSet = set
+	fs.SetBools(&fs.Help, "h", "help", false)
+
+	return fs
 }
 
-func (fs Flags) SetString(v *string, name, defaultVal string) {
+func (fs *Flags) SetString(v *string, name, defaultVal string) {
 	fs.StringVar(v, name, defaultVal, "")
 }
 
-func (fs Flags) SetStrings(v *string, short, long, defaultVal string) {
+func (fs *Flags) SetStrings(v *string, short, long, defaultVal string) {
 	fs.StringVar(v, short, defaultVal, "")
 	fs.StringVar(v, long, defaultVal, "")
 }
 
-func (fs Flags) SetBool(v *bool, name string, defaultVal bool) {
+func (fs *Flags) SetBool(v *bool, name string, defaultVal bool) {
 	fs.BoolVar(v, name, defaultVal, "")
 }
 
-func (fs Flags) SetBools(v *bool, short, long string, defaultVal bool) {
+func (fs *Flags) SetBools(v *bool, short, long string, defaultVal bool) {
 	fs.BoolVar(v, short, defaultVal, "")
 	fs.BoolVar(v, long, defaultVal, "")
 }
 
-func (fs Flags) SetInt(v *int, name string, defaultVal int) {
+func (fs *Flags) SetInt(v *int, name string, defaultVal int) {
 	fs.IntVar(v, name, defaultVal, "")
 }
 
-func (fs Flags) SetInts(v *int, short, long string, defaultVal int) {
+func (fs *Flags) SetInts(v *int, short, long string, defaultVal int) {
 	fs.IntVar(v, short, defaultVal, "")
 	fs.IntVar(v, long, defaultVal, "")
 }
 
 // Passed returns true if any of the given flags were passed by the user.
-func (fs Flags) Passed(names ...string) bool {
+func (fs *Flags) Passed(names ...string) bool {
 	var wasPassed bool
 
 	for _, n := range names {

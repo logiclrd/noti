@@ -22,9 +22,8 @@ var cmdDefault = &slack.Notification{
 }
 
 type Command struct {
-	flag cli.Flags
+	flag *cli.Flags
 	v    vbs.Printer
-	help bool
 
 	n *slack.Notification
 }
@@ -34,7 +33,7 @@ func (c *Command) Parse(args []string) error {
 }
 
 func (c *Command) Notify(stats run.Stats) error {
-	if c.help {
+	if c.flag.Help {
 		fmt.Println(helpText)
 		return nil
 	}
@@ -141,7 +140,6 @@ func NewCommand() cli.NotifyCmd {
 	cmd.flag.SetString(&cmd.n.IconEmoji, "icon-emoji", cmdDefault.IconEmoji)
 
 	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
-	cmd.flag.SetBools(&cmd.help, "h", "help", false)
 
 	return cmd
 }

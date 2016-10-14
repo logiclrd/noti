@@ -8,9 +8,8 @@ import (
 )
 
 type Command struct {
-	flag cli.Flags
+	flag *cli.Flags
 	v    vbs.Printer
-	help bool
 }
 
 func (c *Command) Parse(args []string) error {
@@ -20,7 +19,7 @@ func (c *Command) Parse(args []string) error {
 func (c *Command) Run() error {
 	c.v.Println("Running version command")
 
-	if c.help {
+	if c.flag.Help {
 		fmt.Println("noti version [-verbose -h -help]")
 		return nil
 	}
@@ -38,7 +37,6 @@ func NewCommand() cli.Cmd {
 	}
 
 	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
-	cmd.flag.SetBools(&cmd.help, "h", "help", false)
 
 	return cmd
 }

@@ -11,9 +11,8 @@ import (
 )
 
 type Command struct {
-	flag cli.Flags
+	flag *cli.Flags
 	v    vbs.Printer
-	help bool
 
 	Cmds map[string]cli.Cmd
 }
@@ -29,7 +28,7 @@ func (c *Command) Parse(args []string) error {
 func (c *Command) Run() error {
 	c.v.Println("Running noti command")
 
-	if c.help {
+	if c.flag.Help {
 		fmt.Println(helpText)
 		return nil
 	}
@@ -83,7 +82,6 @@ func NewCommand() cli.NotifyCmd {
 	}
 
 	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
-	cmd.flag.SetBools(&cmd.help, "h", "help", false)
 
 	return cmd
 }

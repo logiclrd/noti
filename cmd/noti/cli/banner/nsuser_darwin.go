@@ -20,11 +20,10 @@ var cmdDefault = &nsuser.Notification{
 }
 
 type Command struct {
-	flag cli.Flags
+	flag *cli.Flags
 	v    vbs.Printer
 	n    *nsuser.Notification
 
-	help     bool
 	ktimeout string
 	timeout  string
 	contains string
@@ -89,7 +88,7 @@ func (c *Command) Notify(stats run.Stats) error {
 }
 
 func (c *Command) Run() error {
-	if c.help {
+	if c.flag.Help {
 		fmt.Println(helpText)
 		return nil
 	}
@@ -161,7 +160,6 @@ func NewCommand() cli.NotifyCmd {
 	cmd.flag.SetString(&cmd.n.SoundName, "sound", cmdDefault.SoundName)
 
 	cmd.flag.SetBool(&cmd.v.Verbose, "verbose", false)
-	cmd.flag.SetBools(&cmd.help, "h", "help", false)
 
 	cmd.flag.SetString(&cmd.ktimeout, "ktimeout", "")
 	cmd.flag.SetString(&cmd.timeout, "timeout", "")
