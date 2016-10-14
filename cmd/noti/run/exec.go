@@ -206,9 +206,9 @@ func execNotify(ctx context.Context, out chan Stats, args []string) {
 }
 
 // ExecContains
-func ExecContains(ctx context.Context, args ...string) chan Stats {
+func ExecContains(ctx context.Context, target string, args ...string) chan Stats {
 	out := make(chan Stats)
-	go execContains(ctx, out, args)
+	go execContains(ctx, out, target, args)
 	return out
 }
 
@@ -223,7 +223,7 @@ func (s *scanWriter) Write(p []byte) (int, error) {
 	return fmt.Fprint(s.out, string(p))
 }
 
-func execContains(ctx context.Context, out chan Stats, args []string) {
+func execContains(ctx context.Context, out chan Stats, target string, args []string) {
 	defer close(out)
 
 	if len(args) == 0 {
@@ -257,8 +257,8 @@ func execContains(ctx context.Context, out chan Stats, args []string) {
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
 	cmd.Stdin = os.Stdin
 
-	scanStdout := &scanWriter{out: os.Stdout, target: []byte("FIND THIS")}
-	scanStderr := &scanWriter{out: os.Stderr, target: []byte("FIND THIS")}
+	scanStdout := &scanWriter{out: os.Stdout, target: []byte(target)}
+	scanStderr := &scanWriter{out: os.Stderr, target: []byte(target)}
 	cmd.Stdout = scanStdout
 	cmd.Stderr = scanStderr
 
