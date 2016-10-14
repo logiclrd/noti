@@ -40,14 +40,11 @@ BOOL installNSBundleHook()
 
 - (void)userNotificationCenter:(NSUserNotificationCenter *)center didDeliverNotification:(NSUserNotification *)notification
 {
-	NSLog(@"Called didDeliverNotification>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     self.keepRunning = NO;
-	NSLog(@"keepRunning: %s", self.keepRunning ? "true" : "false");
 }
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification
 {
-	NSLog(@"Called shouldPresentNotification");
     return YES;
 }
 
@@ -55,7 +52,6 @@ BOOL installNSBundleHook()
 
 void Send(const char *title, const char *subtitle, const char *informativeText, const char *contentImage, const char *soundName)
 {
-	NSLog(@"Called Send");
     @autoreleasepool {
         if (!installNSBundleHook()) {
             return;
@@ -77,7 +73,6 @@ void Send(const char *title, const char *subtitle, const char *informativeText, 
 
         [nc deliverNotification:note];
 
-        NSLog(@"Entering wait loop");
 		int i = 0;
         while (ncDelegate.keepRunning) {
             [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
@@ -86,6 +81,5 @@ void Send(const char *title, const char *subtitle, const char *informativeText, 
 				break;
 			}
         }
-        NSLog(@"Exited wait loop");
     }
 }
