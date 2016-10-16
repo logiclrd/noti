@@ -25,7 +25,7 @@ func Run(trigFlags []string, args []string, notify NotifyFn) error {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	// defer cancel() // This gets called by the first trigger to return.
 
 	sts := statsFromArgs(args)
 
