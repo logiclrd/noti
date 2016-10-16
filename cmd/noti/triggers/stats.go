@@ -66,14 +66,27 @@ func expandAlias(a string) ([]string, error) {
 	shell := os.Getenv("SHELL")
 
 	cmd := exec.Command(shell, "-l", "-i", "-c", "which "+a)
-	e, err := cmd.Output()
+	out, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
-	exp := strings.TrimSpace(string(e))
-	trimLen := fmt.Sprintf("%s: aliased to ", a)
-	exp = exp[len(trimLen):]
-
+	exp := parseExpansion(string(out), a)
 	return strings.Split(exp, " "), nil
+}
+
+func parseExpansion(s, alias string) string {
+	s = strings.TrimSpace(s)
+
+	prefix := fmt.Sprintf("%s: aliased to ", alias)
+	start := strings.Index(s, prefix)
+
+	if start == -1 {
+		return ""
+	}
+
+	s = s[start:]
+	s = s[len(prefix):]
+
+	return s
 }
