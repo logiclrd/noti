@@ -12,81 +12,111 @@ import (
 	"time"
 )
 
-var notiStats = Stats{Cmd: "noti"}
-
-func onExit(ctx context.Context, args []string, out chan Stats) {
-	fmt.Println(">>> onExit")
-
-	sts := statsFromArgs(args)
-	if sts.Cmd == "" {
-		// User executed something like, "noti" or "noti banner".
-		out <- notiStats
-		return
-	}
-
-	var cmd *exec.Cmd
-	if len(sts.ExpandedAlias) == 0 {
-		cmd = exec.CommandContext(ctx, sts.Cmd, sts.Args...)
-	} else {
-		cmd = exec.CommandContext(ctx, sts.ExpandedAlias[0], sts.ExpandedAlias[1:]...)
-	}
-
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	start := time.Now()
-	err := cmd.Run()
-	sts.Duration = time.Since(start)
-
-	if err != nil {
-		sts.Err = err
-		sts.ExitCode = exitCode(err)
-	}
-
-	out <- sts
+type trigger interface {
+	streams() (stdin io.Reader, stdout io.Writer, stderr io.Writer)
+	run(chan error, chan Stats)
 }
 
-func onTimeout(ctx context.Context, wait string, args []string, out chan Stats) {
-	fmt.Println(">>> onTimeout")
+type onExitTrigger struct {
+	stdin  io.Reader
+	stdout io.Writer
+	stderr io.Writer
 
-	sts := statsFromArgs(args)
-	if sts.Cmd == "" {
-		return
+	stats Stats
+	ctx   context.Context
+}
+
+func newOnExitTrigger(ctx context.Context, s Stats) *onExitTrigger {
+	return &onExitTrigger{
+		stdin:  os.Stdin,
+		stdout: os.Stdout,
+		stderr: os.Stderr,
+		stats:  s,
+		ctx:    ctx,
 	}
+}
 
-	dur, err := time.ParseDuration(wait)
-	if err != nil {
-		sts.Err = err
-		out <- sts
-		return
-	}
+func (t *onExitTrigger) streams() (io.Reader, io.Writer, io.Writer) {
+	return t.stdin, t.stdout, t.stderr
+}
 
-	var cancel context.CancelFunc
-	ctx, cancel = context.WithTimeout(ctx, dur)
-	defer cancel()
-
-	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+func (t *onExitTrigger) run(cmdErr chan error, out chan Stats) {
+	fmt.Println(">>> onExit")
+	defer fmt.Println(">>> end onExit")
 
 	start := time.Now()
-	err = cmd.Run()
-	sts.Duration = time.Since(start)
 
-	if err := ctx.Err(); err == context.DeadlineExceeded {
-		sts.Err = errors.New("command timeout exceeded")
-		out <- sts
+	if t.stats.Cmd == "" {
+		// User executed something like, "noti" or "noti banner".
+		out <- Stats{Cmd: "noti"}
 		return
 	}
 
+	fmt.Println("SELECT!!!!")
+	select {
+	case err := <-cmdErr:
+		fmt.Println("PULLED ERR!!!!")
+		if err != nil {
+			t.stats.Err = err
+			t.stats.ExitCode = exitCode(err)
+		}
+		t.stats.Duration = time.Since(start)
+		out <- t.stats
+		fmt.Println("SENT STATS!!!!")
+	case <-t.ctx.Done():
+		fmt.Println("context cancelled!!!!")
+		return
+	}
+}
+
+type onTimeoutTrigger struct {
+	stdin  io.Reader
+	stdout io.Writer
+	stderr io.Writer
+
+	stats Stats
+	ctx   context.Context
+	dur   time.Duration
+}
+
+func newOnTimeoutTrigger(ctx context.Context, s Stats, wait string) (*onTimeoutTrigger, error) {
+	d, err := time.ParseDuration(wait)
 	if err != nil {
-		sts.Err = err
-		sts.ExitCode = exitCode(err)
+		return nil, err
 	}
 
-	out <- sts
+	fmt.Println(">>>>>> CALLED TIMEOUT TRIGGER")
+
+	return &onTimeoutTrigger{
+		stdin:  os.Stdin,
+		stdout: os.Stdout,
+		stderr: os.Stderr,
+		stats:  s,
+		ctx:    ctx,
+		dur:    d,
+	}, nil
+}
+
+func (t *onTimeoutTrigger) streams() (io.Reader, io.Writer, io.Writer) {
+	fmt.Println(">>>>>> CALLED TIMEOUT STREAMS")
+	return t.stdin, t.stdout, t.stderr
+}
+
+func (t *onTimeoutTrigger) run(cmdErr chan error, out chan Stats) {
+	fmt.Println(">>> CALLED TIMEOUT TRIGGER RUN")
+	defer fmt.Println(">>> end onTimeout")
+	start := time.Now()
+
+	select {
+	case <-cmdErr:
+		return
+	case <-time.After(t.dur):
+		t.stats.Err = errors.New("command timeout exceeded")
+		t.stats.Duration = time.Since(start)
+		out <- t.stats
+	case <-t.ctx.Done():
+		return
+	}
 }
 
 type scanWriter struct {
@@ -100,41 +130,53 @@ func (s *scanWriter) Write(p []byte) (int, error) {
 	return fmt.Fprint(s.out, string(p))
 }
 
-func onContains(ctx context.Context, target string, args []string, out chan Stats) {
-	sts := statsFromArgs(args)
-	if sts.Cmd == "" {
-		return
+type onContainsTrigger struct {
+	stdin  io.Reader
+	stdout *scanWriter
+	stderr *scanWriter
+
+	stats  Stats
+	ctx    context.Context
+	target string
+}
+
+func newOnContainsTrigger(ctx context.Context, s Stats, t string) *onContainsTrigger {
+	scanStdout := &scanWriter{out: os.Stdout, target: []byte(t)}
+	scanStderr := &scanWriter{out: os.Stderr, target: []byte(t)}
+
+	return &onContainsTrigger{
+		stdin:  os.Stdin,
+		stdout: scanStdout,
+		stderr: scanStderr,
+		stats:  s,
+		ctx:    ctx,
+		target: t,
 	}
+}
 
-	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
-	cmd.Stdin = os.Stdin
+func (t *onContainsTrigger) streams() (io.Reader, io.Writer, io.Writer) {
+	return t.stdin, t.stdout, t.stderr
+}
 
-	scanStdout := &scanWriter{out: os.Stdout, target: []byte(target)}
-	scanStderr := &scanWriter{out: os.Stderr, target: []byte(target)}
-	cmd.Stdout = scanStdout
-	cmd.Stderr = scanStderr
-
+func (t *onContainsTrigger) run(cmdErr chan error, out chan Stats) {
+	fmt.Println(">>> onContains")
+	defer fmt.Println(">>> end onContains")
 	start := time.Now()
-	errc := make(chan error)
-	go func() { errc <- cmd.Run() }()
 
 	for {
 		select {
-		case <-ctx.Done():
-			fmt.Println(">>>>>>>> CONTEXT CANCELLED!")
-			sts.Duration = time.Since(start)
-			out <- sts
+		case <-t.ctx.Done():
 			return
-		case <-errc:
+		case <-cmdErr:
 			return
 		default:
-			sts.Duration = time.Since(start)
-			sts.State = "running"
+			t.stats.Duration = time.Since(start)
+			t.stats.State = "running"
 
-			if scanStdout.found || scanStderr.found {
-				out <- sts
-				scanStdout.found = false
-				scanStderr.found = false
+			if t.stdout.found || t.stderr.found {
+				out <- t.stats
+				t.stdout.found = false
+				t.stderr.found = false
 			}
 		}
 	}
