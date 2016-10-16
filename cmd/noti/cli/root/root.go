@@ -3,6 +3,8 @@ package root
 import (
 	"fmt"
 	"log"
+	"os"
+	"os/exec"
 
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/config"
@@ -32,6 +34,14 @@ func (c *Command) Parse(args []string) error {
 
 func (c *Command) Run() error {
 	c.v.Println("Running noti command")
+
+	// TODO(jaime): Verify this prevents the weird window clicking behavior.
+	if len(os.Args) == 1 {
+		p, err := exec.LookPath("noti")
+		if err == nil && os.Args[0] == p {
+			return nil
+		}
+	}
 
 	if c.flag.Help {
 		fmt.Println(helpText)
