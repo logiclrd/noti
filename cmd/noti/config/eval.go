@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"text/template"
 
-	"github.com/variadico/noti/cmd/noti/run"
+	"github.com/variadico/noti/cmd/noti/triggers"
 )
 
 // EvalFields evaluates string fields as a text template. n should be
 // a non-nil pointer type. It will be modified.
-func EvalStringFields(n interface{}, st run.Stats) error {
+func EvalStringFields(n interface{}, st triggers.Stats) error {
 	// Grab underlying value of n.
 	v := reflect.ValueOf(n)
 	if err := validateType(v); err != nil {
@@ -37,7 +37,7 @@ func EvalStringFields(n interface{}, st run.Stats) error {
 	return nil
 }
 
-func eval(s string, st run.Stats) (string, error) {
+func eval(s string, st triggers.Stats) (string, error) {
 	tmpl, err := template.New("").Parse(s)
 	if err != nil {
 		return "", err

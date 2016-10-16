@@ -1,4 +1,4 @@
-package run
+package triggers
 
 import (
 	"fmt"
@@ -18,10 +18,42 @@ type Stats struct {
 	Args []string
 	// Stdout   string
 	// Stderr   string
-	ExitCode int
-	Err      error
-	Duration time.Duration
-	State    string
+	ExitCode      int
+	Err           error
+	Duration      time.Duration
+	State         string
+	ExpandedAlias []string
+}
+
+func statsFromArgs(a []string) Stats {
+	if len(a) == 0 {
+		return Stats{}
+	}
+
+	sts := Stats{
+		Cmd:      a[0],
+		Args:     a[1:],
+		ExitCode: noExitCode,
+	}
+
+	if _, err := exec.LookPath(a[0]); err != nil {
+		// Before we run anything, we're going to check if we can find the
+		// command. If we can't find a command, then we'll assume it might be
+		// an aliased command.
+		expanded, expErr := expandAlias(a[0])
+		if expErr != nil {
+			sts.ExitCode = cmdNotFound
+			sts.Err = err
+			return sts
+		}
+
+		// The user command could have been something like:
+		// gss --foo
+		// Put the expanded form first, then the args.
+		sts.ExpandedAlias = append(expanded, a[1:]...)
+	}
+
+	return sts
 }
 
 // expandAlias attempts to expand an alias and return back the real command.

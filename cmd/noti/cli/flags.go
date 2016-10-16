@@ -3,6 +3,8 @@ package cli
 import (
 	"flag"
 	"io/ioutil"
+
+	"github.com/variadico/noti/cmd/noti/triggers"
 )
 
 type Flags struct {
@@ -11,8 +13,7 @@ type Flags struct {
 	Help    bool
 	Verbose bool
 
-	Texit     bool
-	Tcontains string
+	Triggers triggers.Flag
 }
 
 func NewFlags(name string) *Flags {
@@ -25,8 +26,8 @@ func NewFlags(name string) *Flags {
 
 	fs.SetBools(&fs.Help, "h", "help", false)
 	fs.SetBools(&fs.Verbose, "v", "verbose", false)
-	fs.SetBool(&fs.Texit, "texit", true)
-	fs.SetString(&fs.Tcontains, "tcontains", "")
+
+	fs.Var(&fs.Triggers, "trigger", "")
 
 	return fs
 }

@@ -1,13 +1,12 @@
 package banner
 
 import (
-	"context"
 	"fmt"
 	"runtime"
 
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/config"
-	"github.com/variadico/noti/cmd/noti/run"
+	"github.com/variadico/noti/cmd/noti/triggers"
 	"github.com/variadico/noti/nsuser"
 	"github.com/variadico/vbs"
 )
@@ -33,7 +32,7 @@ func (c *Command) Parse(args []string) error {
 	return nil
 }
 
-func (c *Command) Notify(stats run.Stats) error {
+func (c *Command) Notify(stats triggers.Stats) error {
 	conf, err := config.File()
 	if err != nil {
 		c.v.Println(err)
@@ -96,28 +95,8 @@ func (c *Command) Run() error {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	// Used to cancel exec in case of notify failure.
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	if target := c.flag.Tcontains; target != "" {
-		c.v.Println("Trigger: contains")
-		stats := run.ExecContains(ctx, target, c.flag.Args()...)
-		for s := range stats {
-			err := c.Notify(s)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-
-	if c.flag.Texit {
-		c.v.Println("Trigger: exit")
-		return c.Notify(run.Exec(c.flag.Args()...))
-	}
-
-	return nil
+	ts := []string(c.flag.Triggers)
+	return triggers.Run(ts, c.flag.Args(), c.Notify)
 }
 
 func NewCommand() cli.NotifyCmd {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/config"
-	"github.com/variadico/noti/cmd/noti/run"
+	"github.com/variadico/noti/cmd/noti/triggers"
 	"github.com/variadico/noti/say"
 	"github.com/variadico/vbs"
 )
@@ -35,7 +35,7 @@ func (c *Command) Parse(args []string) error {
 	return nil
 }
 
-func (c *Command) Notify(stats run.Stats) error {
+func (c *Command) Notify(stats triggers.Stats) error {
 	conf, err := config.File()
 	if err != nil {
 		c.v.Println(err)
@@ -84,14 +84,12 @@ func (c *Command) Notify(stats run.Stats) error {
 }
 
 func (c *Command) Run() error {
-	fmt.Println(">>>>>>>>  RUNNING SAY!")
-
 	if c.flag.Help {
 		fmt.Println(helpText)
 		return nil
 	}
 
-	return c.Notify(run.Exec(c.flag.Args()...))
+	return nil
 }
 
 func NewCommand() cli.NotifyCmd {
