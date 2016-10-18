@@ -2,8 +2,6 @@ package exit
 
 import (
 	"context"
-	"io"
-	"os"
 	"os/exec"
 	"syscall"
 	"time"
@@ -14,26 +12,15 @@ import (
 const FlagKey = "exit"
 
 type Trigger struct {
-	stdin  io.Reader
-	stdout io.Writer
-	stderr io.Writer
-
 	stats run.Stats
 	ctx   context.Context
 }
 
 func NewTrigger(ctx context.Context, s run.Stats) *Trigger {
 	return &Trigger{
-		stdin:  os.Stdin,
-		stdout: os.Stdout,
-		stderr: os.Stderr,
-		stats:  s,
-		ctx:    ctx,
+		stats: s,
+		ctx:   ctx,
 	}
-}
-
-func (t *Trigger) Streams() (io.Reader, io.Writer, io.Writer) {
-	return t.stdin, t.stdout, t.stderr
 }
 
 func (t *Trigger) Run(cmdErr chan error, stats chan run.Stats) {

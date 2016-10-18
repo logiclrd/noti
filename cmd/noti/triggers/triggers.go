@@ -7,6 +7,9 @@ import (
 )
 
 type Trigger interface {
-	Streams() (stdin io.Reader, stdout io.Writer, stderr io.Writer)
 	Run(chan error, chan run.Stats)
+}
+
+type Streamer interface {
+	Streams() (stdin io.Reader, stdout io.Writer, stderr io.Writer)
 }

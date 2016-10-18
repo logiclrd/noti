@@ -99,7 +99,12 @@ func uniqStreams(ts []Trigger) (stdin io.Reader, stdout io.Writer, stderr io.Wri
 
 	// Make streams unique.
 	for _, t := range ts {
-		sin, sout, serr := t.Streams()
+		s, is := t.(Streamer)
+		if !is {
+			continue
+		}
+
+		sin, sout, serr := s.Streams()
 		inmap[sin] = struct{}{}
 		outmap[sout] = struct{}{}
 		errmap[serr] = struct{}{}
