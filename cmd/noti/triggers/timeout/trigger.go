@@ -5,18 +5,18 @@ import (
 	"errors"
 	"time"
 
-	"github.com/variadico/noti/cmd/noti/run"
+	"github.com/variadico/noti/cmd/noti/runstat"
 )
 
 const FlagKey = "timeout"
 
 type Trigger struct {
-	stats run.Stats
+	stats runstat.Result
 	ctx   context.Context
 	dur   time.Duration
 }
 
-func NewTrigger(ctx context.Context, s run.Stats, d time.Duration) *Trigger {
+func NewTrigger(ctx context.Context, s runstat.Result, d time.Duration) *Trigger {
 	return &Trigger{
 		stats: s,
 		ctx:   ctx,
@@ -24,7 +24,7 @@ func NewTrigger(ctx context.Context, s run.Stats, d time.Duration) *Trigger {
 	}
 }
 
-func (t *Trigger) Run(cmdErr chan error, stats chan run.Stats) {
+func (t *Trigger) Run(cmdErr chan error, stats chan runstat.Result) {
 	start := time.Now()
 
 	select {

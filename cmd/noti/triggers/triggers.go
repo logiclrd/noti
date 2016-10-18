@@ -3,11 +3,11 @@ package triggers
 import (
 	"io"
 
-	"github.com/variadico/noti/cmd/noti/run"
+	"github.com/variadico/noti/cmd/noti/runstat"
 )
 
 type Trigger interface {
-	Run(chan error, chan run.Stats)
+	Run(chan error, chan runstat.Result)
 }
 
 type Streamer interface {

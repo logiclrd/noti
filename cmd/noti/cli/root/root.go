@@ -8,7 +8,7 @@ import (
 
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/config"
-	"github.com/variadico/noti/cmd/noti/run"
+	"github.com/variadico/noti/cmd/noti/runstat"
 	"github.com/variadico/noti/cmd/noti/triggers"
 	"github.com/variadico/vbs"
 )
@@ -52,7 +52,7 @@ func (c *Command) Run() error {
 	return triggers.Run([]string(c.flag.Triggers), c.flag.Args(), c.Notify)
 }
 
-func (c *Command) Notify(stats run.Stats) error {
+func (c *Command) Notify(stats runstat.Result) error {
 	c.v.Println("Notifying")
 
 	conf, err := config.File()

@@ -3,11 +3,11 @@ package config
 import (
 	"testing"
 
-	"github.com/variadico/noti/cmd/noti/run"
+	"github.com/variadico/noti/cmd/noti/runstat"
 )
 
 func TestEvalStringFields(t *testing.T) {
-	st := run.Stats{
+	st := runstat.Result{
 		Cmd: "testing",
 	}
 

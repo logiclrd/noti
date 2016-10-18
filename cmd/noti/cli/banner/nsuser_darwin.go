@@ -6,7 +6,7 @@ import (
 
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/config"
-	"github.com/variadico/noti/cmd/noti/run"
+	"github.com/variadico/noti/cmd/noti/runstat"
 	"github.com/variadico/noti/cmd/noti/triggers"
 	"github.com/variadico/noti/nsuser"
 	"github.com/variadico/vbs"
@@ -33,7 +33,7 @@ func (c *Command) Parse(args []string) error {
 	return nil
 }
 
-func (c *Command) Notify(stats run.Stats) error {
+func (c *Command) Notify(stats runstat.Result) error {
 	c.v.Println("Locking OS thread")
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()

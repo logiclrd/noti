@@ -1,4 +1,4 @@
-package run
+package runstat
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ const (
 	NoExitStatus = -1
 )
 
-type Stats struct {
+type Result struct {
 	Cmd           string
 	Args          []string
 	ExitStatus    int
@@ -23,12 +23,12 @@ type Stats struct {
 	ExpandedAlias []string
 }
 
-func NewStats(args []string) Stats {
+func NewResult(args []string) Result {
 	if len(args) == 0 {
-		return Stats{ExitStatus: NoExitStatus}
+		return Result{ExitStatus: NoExitStatus}
 	}
 
-	sts := Stats{
+	sts := Result{
 		Cmd:        args[0],
 		Args:       args[1:],
 		ExitStatus: NoExitStatus,

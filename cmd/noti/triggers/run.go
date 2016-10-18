@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/variadico/noti/cmd/noti/run"
+	"github.com/variadico/noti/cmd/noti/runstat"
 	"github.com/variadico/noti/cmd/noti/triggers/exit"
 	"github.com/variadico/noti/cmd/noti/triggers/match"
 	"github.com/variadico/noti/cmd/noti/triggers/timeout"
@@ -20,7 +20,7 @@ const (
 	delim = "="
 )
 
-func Run(trigFlags []string, args []string, notify func(run.Stats) error) error {
+func Run(trigFlags []string, args []string, notify func(runstat.Result) error) error {
 	if len(trigFlags) == 0 {
 		trigFlags = append(trigFlags, exit.FlagKey)
 	}
@@ -32,7 +32,7 @@ func Run(trigFlags []string, args []string, notify func(run.Stats) error) error 
 	// return normally. It's okay if this gets called multiple times.
 	defer cancel()
 
-	sts := run.NewStats(args)
+	sts := runstat.NewResult(args)
 
 	trigs := make([]Trigger, 0, len(trigFlags))
 	for _, t := range trigFlags {
@@ -60,7 +60,7 @@ func Run(trigFlags []string, args []string, notify func(run.Stats) error) error 
 	go func() { errc <- cmd.Run() }()
 
 	var wg sync.WaitGroup
-	statsc := make(chan run.Stats)
+	statsc := make(chan runstat.Result)
 
 	for _, t := range trigs {
 		wg.Add(1)
@@ -129,7 +129,7 @@ func uniqStreams(ts []Trigger) (stdin io.Reader, stdout io.Writer, stderr io.Wri
 	return io.MultiReader(stdins...), io.MultiWriter(stdouts...), io.MultiWriter(stderrs...)
 }
 
-func newCmd(ctx context.Context, sts run.Stats, ts []Trigger) *exec.Cmd {
+func newCmd(ctx context.Context, sts runstat.Result, ts []Trigger) *exec.Cmd {
 	var cmd *exec.Cmd
 
 	if len(sts.ExpandedAlias) == 0 {
