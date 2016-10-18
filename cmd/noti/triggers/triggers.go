@@ -2,24 +2,11 @@ package triggers
 
 import (
 	"io"
-	"os/exec"
-	"syscall"
+
+	"github.com/variadico/noti/cmd/noti/stats"
 )
 
-type trigger interface {
-	streams() (stdin io.Reader, stdout io.Writer, stderr io.Writer)
-	run(chan error, chan Stats)
-}
-
-func exitStatus(err error) int {
-	eerr, is := err.(*exec.ExitError)
-	if !is {
-		return noExitStatus
-	}
-
-	if status, is := eerr.Sys().(syscall.WaitStatus); is {
-		return status.ExitStatus()
-	}
-
-	return noExitStatus
+type Trigger interface {
+	Streams() (stdin io.Reader, stdout io.Writer, stderr io.Writer)
+	Run(chan error, chan stats.Info)
 }

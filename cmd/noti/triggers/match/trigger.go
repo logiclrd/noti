@@ -1,13 +1,16 @@
-package triggers
+package match
 
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"time"
+
+	"github.com/variadico/noti/cmd/noti/stats"
 )
+
+const FlagKey = "match"
 
 type scanWriter struct {
 	target []byte
@@ -19,21 +22,21 @@ func (s *scanWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-type matchTrigger struct {
+type Trigger struct {
 	stdin  io.Reader
 	stdout *scanWriter
 	stderr *scanWriter
 
-	stats  Stats
+	stats  stats.Info
 	ctx    context.Context
 	target string
 }
 
-func newMatchTrigger(ctx context.Context, s Stats, t string) *matchTrigger {
-	scanStdout := &scanWriter{target: []byte(t)}
-	scanStderr := &scanWriter{target: []byte(t)}
+func NewTrigger(ctx context.Context, s stats.Info, target string) *Trigger {
+	scanStdout := &scanWriter{target: []byte(target)}
+	scanStderr := &scanWriter{target: []byte(target)}
 
-	return &matchTrigger{
+	return &Trigger{
 		stdin:  os.Stdin,
 		stdout: scanStdout,
 		stderr: scanStderr,
@@ -43,23 +46,18 @@ func newMatchTrigger(ctx context.Context, s Stats, t string) *matchTrigger {
 	}
 }
 
-func (t *matchTrigger) streams() (io.Reader, io.Writer, io.Writer) {
+func (t *Trigger) Streams() (io.Reader, io.Writer, io.Writer) {
 	return t.stdin, t.stdout, t.stderr
 }
 
-func (t *matchTrigger) run(cmdErr chan error, out chan Stats) {
-	fmt.Println(">>> onContains")
-	defer fmt.Println(">>> end onContains")
+func (t *Trigger) Run(cmdErr chan error, stats chan stats.Info) {
 	start := time.Now()
 
-	fmt.Println("starting scan loop")
 	for {
 		select {
 		case <-t.ctx.Done():
-			fmt.Println("contains cancelled!")
 			return
 		case <-cmdErr:
-			fmt.Println("contains pulled error!")
 			return
 		default:
 			t.stats.Duration = time.Since(start)

@@ -8,38 +8,42 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+
+	"github.com/variadico/noti/cmd/noti/stats"
+	"github.com/variadico/noti/cmd/noti/triggers/exit"
+	"github.com/variadico/noti/cmd/noti/triggers/match"
+	"github.com/variadico/noti/cmd/noti/triggers/timeout"
 )
 
 const (
 	delim = "="
 )
 
-type NotifyFn func(Stats) error
-
-func Run(trigFlags []string, args []string, notify NotifyFn) error {
-	fmt.Println(">>>>", trigFlags)
-
+func Run(trigFlags []string, args []string, notify func(stats.Info) error) error {
 	if len(trigFlags) == 0 {
-		trigFlags = append(trigFlags, "exit")
-		fmt.Println(">>>> ADDED EXIT TRIGGER")
+		trigFlags = append(trigFlags, exit.FlagKey)
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	// defer cancel() // This gets called by the first trigger to return.
 
-	sts := statsFromArgs(args)
+	// Typically, the context will get cancelled by the first trigger to
+	// finish. It'll also get called if we hit an error and return early. Or
+	// return normally. It's okay if this gets called multiple times.
+	defer cancel()
 
-	trigs := make([]trigger, 0, len(trigFlags))
+	sts := stats.FromArgs(args)
+
+	trigs := make([]Trigger, 0, len(trigFlags))
 	for _, t := range trigFlags {
 		name, val := keyValue(t)
 
 		switch name {
-		case "exit":
-			trigs = append(trigs, newExitTrigger(ctx, sts))
-		case "contains":
-			trigs = append(trigs, newMatchTrigger(ctx, sts, val))
-		case "timeout":
-			t, err := newTimeoutTrigger(ctx, sts, val)
+		case exit.FlagKey:
+			trigs = append(trigs, exit.NewTrigger(ctx, sts))
+		case match.FlagKey:
+			trigs = append(trigs, match.NewTrigger(ctx, sts, val))
+		case timeout.FlagKey:
+			t, err := timeout.NewTrigger(ctx, sts, val)
 			if err != nil {
 				return err
 			}
@@ -50,18 +54,17 @@ func Run(trigFlags []string, args []string, notify NotifyFn) error {
 		}
 	}
 
-	var wg sync.WaitGroup
-	statsc := make(chan Stats)
 	cmd := newCmd(ctx, sts, trigs)
 	errc := make(chan error)
-
 	go func() { errc <- cmd.Run() }()
-	for _, t := range trigs {
-		fmt.Printf("trigger: %T\n", t)
 
+	var wg sync.WaitGroup
+	statsc := make(chan stats.Info)
+
+	for _, t := range trigs {
 		wg.Add(1)
-		go func(t trigger) {
-			t.run(errc, statsc)
+		go func(t Trigger) {
+			t.Run(errc, statsc)
 			wg.Done()
 			cancel()
 		}(t)
@@ -69,25 +72,23 @@ func Run(trigFlags []string, args []string, notify NotifyFn) error {
 
 	go func() { wg.Wait(); close(statsc) }()
 
-	fmt.Println("waiting for stats")
 	for stat := range statsc {
 		if err := notify(stat); err != nil {
 			return err
 		}
 	}
-	fmt.Println("done waiting")
 
 	return nil
 }
 
-func keyValue(trigger string) (string, string) {
-	i := strings.Index(trigger, delim)
+func keyValue(triggerFlag string) (string, string) {
+	i := strings.Index(triggerFlag, delim)
 	if i == -1 {
-		// Trigger is something like, "exit"
+		// Trigger is something like, "exit".
 		return trigger, ""
 	}
 
-	// Trigger is something like, "contains=hello world"
+	// Trigger is something like, "contains=hello world".
 	t := trigger[:i]
 	return t, trigger[i+1:]
 }
@@ -127,7 +128,7 @@ func uniqStreams(ts []trigger) (stdin io.Reader, stdout io.Writer, stderr io.Wri
 	return io.MultiReader(stdins...), io.MultiWriter(stdouts...), io.MultiWriter(stderrs...)
 }
 
-func newCmd(ctx context.Context, sts Stats, ts []trigger) *exec.Cmd {
+func newCmd(ctx context.Context, sts stats.Info, ts []Trigger) *exec.Cmd {
 	var cmd *exec.Cmd
 
 	if len(sts.ExpandedAlias) == 0 {

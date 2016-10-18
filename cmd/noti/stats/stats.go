@@ -1,4 +1,4 @@
-package triggers
+package stats
 
 import (
 	"fmt"
@@ -9,51 +9,49 @@ import (
 )
 
 const (
-	cmdNotFound = 127
-	noExitStatus  = -1
+	CmdNotFound  = 127
+	NoExitStatus = -1
 )
 
-type Stats struct {
-	Cmd  string
-	Args []string
-	// Stdout   string
-	// Stderr   string
-	ExitStatus      int
+type Info struct {
+	Cmd           string
+	Args          []string
+	ExitStatus    int
 	Err           error
 	Duration      time.Duration
 	State         string
 	ExpandedAlias []string
 }
 
-func statsFromArgs(a []string) Stats {
-	if len(a) == 0 {
-		return Stats{ExitStatus: noExitStatus}
+func FromArgs(args []string) Info {
+	if len(args) == 0 {
+		return Info{ExitStatus: NoExitStatus}
 	}
 
-	sts := Stats{
-		Cmd:      a[0],
-		Args:     a[1:],
-		ExitStatus: noExitStatus,
+	info := Info{
+		Cmd:        args[0],
+		Args:       args[1:],
+		ExitStatus: NoExitStatus,
 	}
 
-	if _, err := exec.LookPath(a[0]); err != nil {
+	if _, err := exec.LookPath(args[0]); err != nil {
 		// Before we run anything, we're going to check if we can find the
 		// command. If we can't find a command, then we'll assume it might be
 		// an aliased command.
-		expanded, expErr := expandAlias(a[0])
+		expanded, expErr := expandAlias(args[0])
 		if expErr != nil {
-			sts.ExitStatus = cmdNotFound
-			sts.Err = err
-			return sts
+			info.ExitStatus = CmdNotFound
+			info.Err = err
+			return info
 		}
 
 		// The user command could have been something like:
 		// gss --foo
 		// Put the expanded form first, then the args.
-		sts.ExpandedAlias = append(expanded, a[1:]...)
+		info.ExpandedAlias = append(expanded, args[1:]...)
 	}
 
-	return sts
+	return info
 }
 
 // expandAlias attempts to expand an alias and return back the real command.
