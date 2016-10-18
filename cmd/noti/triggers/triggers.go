@@ -55,7 +55,7 @@ func (t *onExitTrigger) run(cmdErr chan error, out chan Stats) {
 	fmt.Println("SELECT!!!!")
 	select {
 	case err := <-cmdErr:
-		fmt.Println("PULLED ERR!!!!")
+		fmt.Println("PULLED ERR!!!!", err)
 		if err != nil {
 			t.stats.Err = err
 			t.stats.ExitCode = exitCode(err)
@@ -64,7 +64,7 @@ func (t *onExitTrigger) run(cmdErr chan error, out chan Stats) {
 		out <- t.stats
 		fmt.Println("SENT STATS!!!!")
 	case <-t.ctx.Done():
-		fmt.Println("context cancelled!!!!")
+		fmt.Println("exit cancelled!!!!")
 		return
 	}
 }
@@ -122,12 +122,11 @@ func (t *onTimeoutTrigger) run(cmdErr chan error, out chan Stats) {
 type scanWriter struct {
 	target []byte
 	found  bool
-	out    io.Writer
 }
 
 func (s *scanWriter) Write(p []byte) (int, error) {
 	s.found = bytes.Contains(p, s.target)
-	return fmt.Fprint(s.out, string(p))
+	return len(p), nil
 }
 
 type onContainsTrigger struct {
@@ -141,8 +140,8 @@ type onContainsTrigger struct {
 }
 
 func newOnContainsTrigger(ctx context.Context, s Stats, t string) *onContainsTrigger {
-	scanStdout := &scanWriter{out: os.Stdout, target: []byte(t)}
-	scanStderr := &scanWriter{out: os.Stderr, target: []byte(t)}
+	scanStdout := &scanWriter{target: []byte(t)}
+	scanStderr := &scanWriter{target: []byte(t)}
 
 	return &onContainsTrigger{
 		stdin:  os.Stdin,
@@ -163,11 +162,14 @@ func (t *onContainsTrigger) run(cmdErr chan error, out chan Stats) {
 	defer fmt.Println(">>> end onContains")
 	start := time.Now()
 
+	fmt.Println("starting scan loop")
 	for {
 		select {
 		case <-t.ctx.Done():
+			fmt.Println("contains cancelled!")
 			return
 		case <-cmdErr:
+			fmt.Println("contains pulled error!")
 			return
 		default:
 			t.stats.Duration = time.Since(start)
