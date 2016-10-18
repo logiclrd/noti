@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/variadico/noti/cmd/noti/stats"
+	"github.com/variadico/noti/cmd/noti/run"
 )
 
 const FlagKey = "match"
@@ -27,12 +27,12 @@ type Trigger struct {
 	stdout *scanWriter
 	stderr *scanWriter
 
-	stats  stats.Info
+	stats  run.Stats
 	ctx    context.Context
 	target string
 }
 
-func NewTrigger(ctx context.Context, s stats.Info, target string) *Trigger {
+func NewTrigger(ctx context.Context, s run.Stats, target string) *Trigger {
 	scanStdout := &scanWriter{target: []byte(target)}
 	scanStderr := &scanWriter{target: []byte(target)}
 
@@ -42,7 +42,7 @@ func NewTrigger(ctx context.Context, s stats.Info, target string) *Trigger {
 		stderr: scanStderr,
 		stats:  s,
 		ctx:    ctx,
-		target: t,
+		target: target,
 	}
 }
 
@@ -50,7 +50,7 @@ func (t *Trigger) Streams() (io.Reader, io.Writer, io.Writer) {
 	return t.stdin, t.stdout, t.stderr
 }
 
-func (t *Trigger) Run(cmdErr chan error, stats chan stats.Info) {
+func (t *Trigger) Run(cmdErr chan error, stats chan run.Stats) {
 	start := time.Now()
 
 	for {
@@ -64,7 +64,7 @@ func (t *Trigger) Run(cmdErr chan error, stats chan stats.Info) {
 			t.stats.State = "running"
 
 			if t.stdout.found || t.stderr.found {
-				out <- t.stats
+				stats <- t.stats
 				t.stdout.found = false
 				t.stderr.found = false
 			}

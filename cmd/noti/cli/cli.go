@@ -1,6 +1,6 @@
 package cli
 
-import "github.com/variadico/noti/cmd/noti/triggers"
+import "github.com/variadico/noti/cmd/noti/run"
 
 type Cmd interface {
 	Run() error
@@ -9,5 +9,5 @@ type Cmd interface {
 
 type NotifyCmd interface {
 	Cmd
-	Notify(triggers.Stats) error
+	Notify(run.Stats) error
 }

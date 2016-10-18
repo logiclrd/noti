@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/variadico/noti/cmd/noti/stats"
+	"github.com/variadico/noti/cmd/noti/run"
 )
 
 const FlagKey = "timeout"
@@ -17,12 +17,12 @@ type Trigger struct {
 	stdout io.Writer
 	stderr io.Writer
 
-	stats stats.Info
+	stats run.Stats
 	ctx   context.Context
 	dur   time.Duration
 }
 
-func NewTrigger(ctx context.Context, s stats.Info, wait string) (*Trigger, error) {
+func NewTrigger(ctx context.Context, s run.Stats, wait string) (*Trigger, error) {
 	d, err := time.ParseDuration(wait)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func (t *Trigger) Streams() (io.Reader, io.Writer, io.Writer) {
 	return t.stdin, t.stdout, t.stderr
 }
 
-func (t *Trigger) Run(cmdErr chan error, stats chan stats.Info) {
+func (t *Trigger) Run(cmdErr chan error, stats chan run.Stats) {
 	start := time.Now()
 
 	select {
@@ -53,6 +53,6 @@ func (t *Trigger) Run(cmdErr chan error, stats chan stats.Info) {
 	case <-time.After(t.dur):
 		t.stats.Err = errors.New("command timeout exceeded")
 		t.stats.Duration = time.Since(start)
-		out <- t.stats
+		stats <- t.stats
 	}
 }

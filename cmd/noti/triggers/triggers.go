@@ -3,10 +3,10 @@ package triggers
 import (
 	"io"
 
-	"github.com/variadico/noti/cmd/noti/stats"
+	"github.com/variadico/noti/cmd/noti/run"
 )
 
 type Trigger interface {
 	Streams() (stdin io.Reader, stdout io.Writer, stderr io.Writer)
-	Run(chan error, chan stats.Info)
+	Run(chan error, chan run.Stats)
 }

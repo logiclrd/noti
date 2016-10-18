@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/variadico/noti/cmd/noti/stats"
+	"github.com/variadico/noti/cmd/noti/run"
 	"github.com/variadico/noti/cmd/noti/triggers/exit"
 	"github.com/variadico/noti/cmd/noti/triggers/match"
 	"github.com/variadico/noti/cmd/noti/triggers/timeout"
@@ -19,7 +19,7 @@ const (
 	delim = "="
 )
 
-func Run(trigFlags []string, args []string, notify func(stats.Info) error) error {
+func Run(trigFlags []string, args []string, notify func(run.Stats) error) error {
 	if len(trigFlags) == 0 {
 		trigFlags = append(trigFlags, exit.FlagKey)
 	}
@@ -31,7 +31,7 @@ func Run(trigFlags []string, args []string, notify func(stats.Info) error) error
 	// return normally. It's okay if this gets called multiple times.
 	defer cancel()
 
-	sts := stats.FromArgs(args)
+	sts := run.NewStats(args)
 
 	trigs := make([]Trigger, 0, len(trigFlags))
 	for _, t := range trigFlags {
@@ -59,7 +59,7 @@ func Run(trigFlags []string, args []string, notify func(stats.Info) error) error
 	go func() { errc <- cmd.Run() }()
 
 	var wg sync.WaitGroup
-	statsc := make(chan stats.Info)
+	statsc := make(chan run.Stats)
 
 	for _, t := range trigs {
 		wg.Add(1)
@@ -81,26 +81,25 @@ func Run(trigFlags []string, args []string, notify func(stats.Info) error) error
 	return nil
 }
 
-func keyValue(triggerFlag string) (string, string) {
-	i := strings.Index(triggerFlag, delim)
+func keyValue(s string) (string, string) {
+	i := strings.Index(s, delim)
 	if i == -1 {
 		// Trigger is something like, "exit".
-		return trigger, ""
+		return s, ""
 	}
 
 	// Trigger is something like, "contains=hello world".
-	t := trigger[:i]
-	return t, trigger[i+1:]
+	return s[:i], s[i+1:]
 }
 
-func uniqStreams(ts []trigger) (stdin io.Reader, stdout io.Writer, stderr io.Writer) {
+func uniqStreams(ts []Trigger) (stdin io.Reader, stdout io.Writer, stderr io.Writer) {
 	inmap := make(map[io.Reader]struct{})
 	outmap := make(map[io.Writer]struct{})
 	errmap := make(map[io.Writer]struct{})
 
 	// Make streams unique.
 	for _, t := range ts {
-		sin, sout, serr := t.streams()
+		sin, sout, serr := t.Streams()
 		inmap[sin] = struct{}{}
 		outmap[sout] = struct{}{}
 		errmap[serr] = struct{}{}
@@ -128,7 +127,7 @@ func uniqStreams(ts []trigger) (stdin io.Reader, stdout io.Writer, stderr io.Wri
 	return io.MultiReader(stdins...), io.MultiWriter(stdouts...), io.MultiWriter(stderrs...)
 }
 
-func newCmd(ctx context.Context, sts stats.Info, ts []Trigger) *exec.Cmd {
+func newCmd(ctx context.Context, sts run.Stats, ts []Trigger) *exec.Cmd {
 	var cmd *exec.Cmd
 
 	if len(sts.ExpandedAlias) == 0 {

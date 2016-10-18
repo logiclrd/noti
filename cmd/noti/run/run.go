@@ -1,4 +1,4 @@
-package stats
+package run
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ const (
 	NoExitStatus = -1
 )
 
-type Info struct {
+type Stats struct {
 	Cmd           string
 	Args          []string
 	ExitStatus    int
@@ -23,12 +23,12 @@ type Info struct {
 	ExpandedAlias []string
 }
 
-func FromArgs(args []string) Info {
+func NewStats(args []string) Stats {
 	if len(args) == 0 {
-		return Info{ExitStatus: NoExitStatus}
+		return Stats{ExitStatus: NoExitStatus}
 	}
 
-	info := Info{
+	sts := Stats{
 		Cmd:        args[0],
 		Args:       args[1:],
 		ExitStatus: NoExitStatus,
@@ -40,18 +40,18 @@ func FromArgs(args []string) Info {
 		// an aliased command.
 		expanded, expErr := expandAlias(args[0])
 		if expErr != nil {
-			info.ExitStatus = CmdNotFound
-			info.Err = err
-			return info
+			sts.ExitStatus = CmdNotFound
+			sts.Err = err
+			return sts
 		}
 
 		// The user command could have been something like:
 		// gss --foo
 		// Put the expanded form first, then the args.
-		info.ExpandedAlias = append(expanded, args[1:]...)
+		sts.ExpandedAlias = append(expanded, args[1:]...)
 	}
 
-	return info
+	return sts
 }
 
 // expandAlias attempts to expand an alias and return back the real command.
