@@ -93,9 +93,9 @@ func keyValue(s string) (string, string) {
 }
 
 func uniqStreams(ts []Trigger) (stdin io.Reader, stdout io.Writer, stderr io.Writer) {
-	inmap := make(map[io.Reader]struct{})
-	outmap := make(map[io.Writer]struct{})
-	errmap := make(map[io.Writer]struct{})
+	inmap := map[io.Reader]struct{}{os.Stdin: struct{}{}}
+	outmap := map[io.Writer]struct{}{os.Stdout: struct{}{}}
+	errmap := map[io.Writer]struct{}{os.Stderr: struct{}{}}
 
 	// Make streams unique.
 	for _, t := range ts {
@@ -119,10 +119,6 @@ func uniqStreams(ts []Trigger) (stdin io.Reader, stdout io.Writer, stderr io.Wri
 	for s := range errmap {
 		stderrs = append(stderrs, s)
 	}
-
-	fmt.Println("numstdins:", len(stdins))
-	fmt.Println("numstdouts:", len(stdouts))
-	fmt.Println("numstderrs:", len(stderrs))
 
 	return io.MultiReader(stdins...), io.MultiWriter(stdouts...), io.MultiWriter(stderrs...)
 }
