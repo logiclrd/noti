@@ -101,9 +101,5 @@ func NewCommand() cli.NotifyCmd {
 	cmd.flag.SetString(&cmd.n.Voice, "voice", cmdDefault.Voice)
 	cmd.flag.SetInt(&cmd.n.Rate, "rate", cmdDefault.Rate)
 
-	cmd.flag.SetString(&cmd.ktimeout, "ktimeout", "")
-	cmd.flag.SetString(&cmd.timeout, "timeout", "")
-	cmd.flag.SetString(&cmd.contains, "contains", "")
-
 	return cmd
 }
