@@ -9,6 +9,7 @@ import (
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/config"
 	"github.com/variadico/noti/cmd/noti/run"
+	"github.com/variadico/noti/cmd/noti/triggers"
 	"github.com/variadico/vbs"
 )
 
@@ -35,7 +36,7 @@ func (c *Command) Parse(args []string) error {
 func (c *Command) Run() error {
 	c.v.Println("Running noti command")
 
-	// TODO(jaime): Verify this prevents the weird window clicking behavior.
+	// Prevents noti from running again when user clicks notification.
 	if len(os.Args) == 1 {
 		p, err := exec.LookPath("noti")
 		if err == nil && os.Args[0] == p {
@@ -48,7 +49,7 @@ func (c *Command) Run() error {
 		return nil
 	}
 
-	return nil
+	return triggers.Run([]string(c.flag.Triggers), c.flag.Args(), c.Notify)
 }
 
 func (c *Command) Notify(stats run.Stats) error {

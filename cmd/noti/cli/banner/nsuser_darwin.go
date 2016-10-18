@@ -34,6 +34,10 @@ func (c *Command) Parse(args []string) error {
 }
 
 func (c *Command) Notify(stats run.Stats) error {
+	c.v.Println("Locking OS thread")
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	conf, err := config.File()
 	if err != nil {
 		c.v.Println(err)
@@ -93,11 +97,7 @@ func (c *Command) Run() error {
 		return nil
 	}
 
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
-	ts := []string(c.flag.Triggers)
-	return triggers.Run(ts, c.flag.Args(), c.Notify)
+	return triggers.Run([]string(c.flag.Triggers), c.flag.Args(), c.Notify)
 }
 
 func NewCommand() cli.NotifyCmd {
