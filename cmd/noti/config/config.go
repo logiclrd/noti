@@ -1,7 +1,6 @@
 package config
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -63,16 +62,4 @@ func decompose(p string) []string {
 	}
 
 	return out
-}
-
-func WasSet(fs *flag.FlagSet, name string) bool {
-	var wasSet bool
-
-	fs.Visit(func(f *flag.Flag) {
-		if f.Name == name {
-			wasSet = true
-		}
-	})
-
-	return wasSet
 }
