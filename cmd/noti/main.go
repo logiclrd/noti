@@ -41,7 +41,7 @@ func main() {
 	cmd, found = noti.Cmds[noti.Args()[0]]
 
 	if found {
-		// Command is something like: noti foo ls
+		// Command is something like: "noti foo ls"
 		if err := cmd.Parse(noti.Args()[1:]); err != nil {
 			log.Println("Error:", err)
 			log.Fatalf("Try 'noti %s -help' for more information.", noti.Args()[0])
