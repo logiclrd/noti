@@ -16,17 +16,12 @@ type Trigger struct {
 	dur   time.Duration
 }
 
-func NewTrigger(ctx context.Context, s run.Stats, wait string) (*Trigger, error) {
-	d, err := time.ParseDuration(wait)
-	if err != nil {
-		return nil, err
-	}
-
+func NewTrigger(ctx context.Context, s run.Stats, d time.Duration) *Trigger {
 	return &Trigger{
 		stats: s,
 		ctx:   ctx,
 		dur:   d,
-	}, nil
+	}
 }
 
 func (t *Trigger) Run(cmdErr chan error, stats chan run.Stats) {

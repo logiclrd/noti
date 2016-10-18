@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/variadico/noti/cmd/noti/run"
 	"github.com/variadico/noti/cmd/noti/triggers/exit"
@@ -43,12 +44,12 @@ func Run(trigFlags []string, args []string, notify func(run.Stats) error) error 
 		case match.FlagKey:
 			trigs = append(trigs, match.NewTrigger(ctx, sts, val))
 		case timeout.FlagKey:
-			t, err := timeout.NewTrigger(ctx, sts, val)
+			d, err := time.ParseDuration(val)
 			if err != nil {
 				return err
 			}
 
-			trigs = append(trigs, t)
+			trigs = append(trigs, timeout.NewTrigger(ctx, sts, d))
 		default:
 			return fmt.Errorf("unknown trigger: %s", name)
 		}
