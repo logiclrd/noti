@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 * Configuration file
-* Templates for run stats (duration, exit code, and more)
+* Templates for run stats (duration, exit status, and more)
+* Notification triggers
 
 ### Changed
 
