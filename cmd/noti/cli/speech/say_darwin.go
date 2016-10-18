@@ -6,6 +6,7 @@ import (
 	"github.com/variadico/noti/cmd/noti/cli"
 	"github.com/variadico/noti/cmd/noti/config"
 	"github.com/variadico/noti/cmd/noti/run"
+	"github.com/variadico/noti/cmd/noti/triggers"
 	"github.com/variadico/noti/say"
 	"github.com/variadico/vbs"
 )
@@ -20,10 +21,6 @@ type Command struct {
 	flag *cli.Flags
 	v    vbs.Printer
 	n    *say.Notification
-
-	ktimeout string
-	timeout  string
-	contains string
 }
 
 func (c *Command) Parse(args []string) error {
@@ -89,7 +86,7 @@ func (c *Command) Run() error {
 		return nil
 	}
 
-	return nil
+	return triggers.Run([]string(c.flag.Triggers), c.flag.Args(), c.Notify)
 }
 
 func NewCommand() cli.NotifyCmd {
