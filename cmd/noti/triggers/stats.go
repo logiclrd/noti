@@ -10,7 +10,7 @@ import (
 
 const (
 	cmdNotFound = 127
-	noExitCode  = -1
+	noExitStatus  = -1
 )
 
 type Stats struct {
@@ -18,7 +18,7 @@ type Stats struct {
 	Args []string
 	// Stdout   string
 	// Stderr   string
-	ExitCode      int
+	ExitStatus      int
 	Err           error
 	Duration      time.Duration
 	State         string
@@ -27,13 +27,13 @@ type Stats struct {
 
 func statsFromArgs(a []string) Stats {
 	if len(a) == 0 {
-		return Stats{}
+		return Stats{ExitStatus: noExitStatus}
 	}
 
 	sts := Stats{
 		Cmd:      a[0],
 		Args:     a[1:],
-		ExitCode: noExitCode,
+		ExitStatus: noExitStatus,
 	}
 
 	if _, err := exec.LookPath(a[0]); err != nil {
@@ -42,7 +42,7 @@ func statsFromArgs(a []string) Stats {
 		// an aliased command.
 		expanded, expErr := expandAlias(a[0])
 		if expErr != nil {
-			sts.ExitCode = cmdNotFound
+			sts.ExitStatus = cmdNotFound
 			sts.Err = err
 			return sts
 		}

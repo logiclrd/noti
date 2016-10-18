@@ -35,11 +35,11 @@ func Run(trigFlags []string, args []string, notify NotifyFn) error {
 
 		switch name {
 		case "exit":
-			trigs = append(trigs, newOnExitTrigger(ctx, sts))
+			trigs = append(trigs, newExitTrigger(ctx, sts))
 		case "contains":
-			trigs = append(trigs, newOnContainsTrigger(ctx, sts, val))
+			trigs = append(trigs, newMatchTrigger(ctx, sts, val))
 		case "timeout":
-			t, err := newOnTimeoutTrigger(ctx, sts, val)
+			t, err := newTimeoutTrigger(ctx, sts, val)
 			if err != nil {
 				return err
 			}
