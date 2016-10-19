@@ -112,9 +112,9 @@ func NewCommand() cli.NotifyCmd {
 	cmd.flag.SetStrings(&cmd.n.Body, "m", "message", cmdDefault.Body)
 
 	cmd.flag.SetString(&cmd.n.AppName, "app-name", cmdDefault.AppName)
-	cmd.flag.SetString(&cmd.n.ReplacesID, "replaces-id", cmdDefault.ReplacesID)
+	cmd.flag.SetUint(&cmd.n.ReplacesID, "replaces-id", cmdDefault.ReplacesID)
 	cmd.flag.SetString(&cmd.n.AppIcon, "icon", cmdDefault.AppIcon)
-	cmd.flag.SetString(&cmd.n.ExpireTimeout, "timeout", cmdDefault.ExpireTimeout)
+	cmd.flag.SetInt(&cmd.n.ExpireTimeout, "timeout", cmdDefault.ExpireTimeout)
 
 	return cmd
 }

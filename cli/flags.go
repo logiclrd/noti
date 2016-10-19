@@ -59,6 +59,15 @@ func (fs *Flags) SetInts(v *int, short, long string, defaultVal int) {
 	fs.IntVar(v, long, defaultVal, "")
 }
 
+func (fs *Flags) SetUint(v *uint, name string, defaultVal uint) {
+	fs.UintVar(v, name, defaultVal, "")
+}
+
+func (fs *Flags) SetUints(v *uint, short, long string, defaultVal uint) {
+	fs.UintVar(v, short, defaultVal, "")
+	fs.UintVar(v, long, defaultVal, "")
+}
+
 // Passed returns true if any of the given flags were passed by the user.
 func (fs *Flags) Passed(names ...string) bool {
 	var wasPassed bool
