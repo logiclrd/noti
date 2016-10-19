@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 
 	"github.com/variadico/noti/cli"
 	"github.com/variadico/noti/config"
@@ -36,12 +37,18 @@ func (c *Command) Parse(args []string) error {
 func (c *Command) Run() error {
 	c.v.Println("Running noti command")
 
-	// Prevents noti from running again when user clicks notification.
-	if len(os.Args) == 1 {
-		p, err := exec.LookPath("noti")
-		if err == nil && os.Args[0] == p {
-			return nil
+	if runtime.GOOS == "darwin" {
+		// Prevents noti from running again when user clicks notification.
+		if len(os.Args) == 1 {
+			p, err := exec.LookPath("noti")
+			if err == nil && os.Args[0] == p {
+				return nil
+			}
 		}
+
+		c.v.Println("Locking OS thread")
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
 	}
 
 	if c.flag.Help {
