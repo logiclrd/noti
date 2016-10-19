@@ -1,4 +1,4 @@
-package noti
+package ntypes
 
 type Notification interface {
 	Send() error
