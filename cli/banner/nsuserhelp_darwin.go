@@ -15,7 +15,7 @@ OPTIONS
     -sound
         Notification sound.
 
-    -verbose
+    -v, -verbose
         Enable verbose mode.
     -h, -help
         Show help.

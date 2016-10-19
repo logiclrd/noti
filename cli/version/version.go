@@ -25,7 +25,7 @@ func (c *Command) Run() error {
 	c.v.Println("Running version command")
 
 	if c.flag.Help {
-		fmt.Println("noti version [-verbose -h -help]")
+		fmt.Println(helpText)
 		return nil
 	}
 

@@ -3,7 +3,7 @@ package root
 var helpText = `noti [options] [notification [options]] [command]
 
 OPTIONS
-    -verbose
+    -v, -verbose
         Enable verbose mode.
     -h, -help
         Show help.

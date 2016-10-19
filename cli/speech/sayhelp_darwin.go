@@ -11,7 +11,7 @@ OPTIONS
     -voice
         Voice used to speak. Default is "Alex".
 
-    -verbose
+    -v, -verbose
         Enable verbose mode.
     -h, -help
         Show help.
