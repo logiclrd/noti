@@ -5,6 +5,7 @@ package config
 
 import (
 	"github.com/variadico/noti/ntypes/espeak"
+	"github.com/variadico/noti/ntypes/freedesktop"
 	"github.com/variadico/noti/ntypes/slack"
 )
 
