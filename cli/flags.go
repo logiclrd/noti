@@ -4,7 +4,7 @@ import (
 	"flag"
 	"io/ioutil"
 
-	"github.com/variadico/noti/cmd/noti/triggers"
+	"github.com/variadico/noti/triggers"
 )
 
 type Flags struct {

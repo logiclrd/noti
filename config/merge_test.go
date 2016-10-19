@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/variadico/noti/nsuser"
+	"github.com/variadico/noti/ntypes/nsuser"
 )
 
 func TestMergeFields(t *testing.T) {

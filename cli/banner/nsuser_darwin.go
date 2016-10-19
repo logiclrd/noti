@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/variadico/noti/cmd/noti/cli"
-	"github.com/variadico/noti/cmd/noti/config"
-	"github.com/variadico/noti/cmd/noti/runstat"
-	"github.com/variadico/noti/cmd/noti/triggers"
-	"github.com/variadico/noti/nsuser"
+	"github.com/variadico/noti/cli"
+	"github.com/variadico/noti/config"
+	"github.com/variadico/noti/ntypes/nsuser"
+	"github.com/variadico/noti/runstat"
+	"github.com/variadico/noti/triggers"
 	"github.com/variadico/vbs"
 )
 

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"text/template"
 
-	"github.com/variadico/noti/cmd/noti/runstat"
+	"github.com/variadico/noti/runstat"
 )
 
 // EvalFields evaluates string fields as a text template. n should be

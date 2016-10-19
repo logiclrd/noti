@@ -1,9 +1,6 @@
 package config
 
-import (
-	"github.com/variadico/noti/notifyicon"
-	"github.com/variadico/noti/slack"
-)
+import "github.com/variadico/noti/ntypes/slack"
 
 type Options struct {
 	DefaultSet []string

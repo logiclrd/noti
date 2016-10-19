@@ -1,6 +1,6 @@
 package cli
 
-import "github.com/variadico/noti/cmd/noti/runstat"
+import "github.com/variadico/noti/runstat"
 
 type Cmd interface {
 	Run() error

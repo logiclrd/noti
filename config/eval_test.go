@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/variadico/noti/cmd/noti/runstat"
+	"github.com/variadico/noti/runstat"
 )
 
 func TestEvalStringFields(t *testing.T) {

@@ -3,11 +3,11 @@ package speech
 import (
 	"fmt"
 
-	"github.com/variadico/noti/cmd/noti/cli"
-	"github.com/variadico/noti/cmd/noti/config"
-	"github.com/variadico/noti/cmd/noti/runstat"
-	"github.com/variadico/noti/cmd/noti/triggers"
-	"github.com/variadico/noti/say"
+	"github.com/variadico/noti/cli"
+	"github.com/variadico/noti/config"
+	"github.com/variadico/noti/ntypes/say"
+	"github.com/variadico/noti/runstat"
+	"github.com/variadico/noti/triggers"
 	"github.com/variadico/vbs"
 )
 

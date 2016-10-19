@@ -6,7 +6,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/variadico/noti/cmd/noti/runstat"
+	"github.com/variadico/noti/runstat"
 )
 
 const FlagKey = "exit"

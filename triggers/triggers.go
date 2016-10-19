@@ -3,7 +3,7 @@ package triggers
 import (
 	"io"
 
-	"github.com/variadico/noti/cmd/noti/runstat"
+	"github.com/variadico/noti/runstat"
 )
 
 type Trigger interface {

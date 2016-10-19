@@ -3,7 +3,7 @@ package version
 import (
 	"fmt"
 
-	"github.com/variadico/noti/cmd/noti/cli"
+	"github.com/variadico/noti/cli"
 	"github.com/variadico/vbs"
 )
 

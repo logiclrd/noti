@@ -4,12 +4,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/variadico/noti/cmd/noti/cli"
-	"github.com/variadico/noti/cmd/noti/cli/banner"
-	"github.com/variadico/noti/cmd/noti/cli/root"
-	"github.com/variadico/noti/cmd/noti/cli/slack"
-	"github.com/variadico/noti/cmd/noti/cli/speech"
-	"github.com/variadico/noti/cmd/noti/cli/version"
+	"github.com/variadico/noti/cli"
+	"github.com/variadico/noti/cli/banner"
+	"github.com/variadico/noti/cli/root"
+	"github.com/variadico/noti/cli/slack"
+	"github.com/variadico/noti/cli/speech"
+	"github.com/variadico/noti/cli/version"
 )
 
 func main() {

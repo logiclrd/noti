@@ -10,10 +10,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/variadico/noti/cmd/noti/runstat"
-	"github.com/variadico/noti/cmd/noti/triggers/exit"
-	"github.com/variadico/noti/cmd/noti/triggers/match"
-	"github.com/variadico/noti/cmd/noti/triggers/timeout"
+	"github.com/variadico/noti/runstat"
+	"github.com/variadico/noti/triggers/exit"
+	"github.com/variadico/noti/triggers/match"
+	"github.com/variadico/noti/triggers/timeout"
 )
 
 const (

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/variadico/noti/cmd/noti/runstat"
+	"github.com/variadico/noti/runstat"
 )
 
 const FlagKey = "timeout"
