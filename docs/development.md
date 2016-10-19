@@ -2,10 +2,11 @@
 
 ## Project layout
 
-* `noti/{banner,speech,slack,etc...}` - general purpose notification library
-* `noti/cmd/noti` - noti command line utility
-* `noti/docs` - documentation for the library and command
-* `noti/tests` - tests for the library and command
+* `cli` - subcommands and flags
+* `config` - configuration helpers
+* `ntypes` - notification types
+* `runstat` - run statistics
+* `triggers` - notification triggers
 
 ## Configuration
 
@@ -24,11 +25,11 @@ You can pass the following template strings to certain notification options.
 ```
 {{.Cmd}}
 {{.Args}}
-{{.Stdout}}
-{{.Stderr}}
-{{.ExitCode}}
-{{.ExecErr}}
+{{.ExitStatus}}
+{{.Err}}
 {{.Duration}}
+{{.State}}
+{{.ExpandedAlias}}
 ```
 
-For example, `noti banner -subtitle 'Exit code: {{.ExitCode}}`.
+For example, `noti banner -subtitle 'Exit status: {{.ExitStatus}}`.
