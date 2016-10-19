@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/variadico/noti/config"
 	"github.com/variadico/noti/runstat"
 	"github.com/variadico/noti/triggers/exit"
 	"github.com/variadico/noti/triggers/match"
@@ -21,6 +22,12 @@ const (
 )
 
 func Run(trigFlags []string, args []string, notify func(runstat.Result) error) error {
+	conf, err := config.File()
+	if err != nil {
+		return err
+	}
+	trigFlags = append(trigFlags, conf.DefaultTriggers...)
+
 	if len(trigFlags) == 0 {
 		trigFlags = append(trigFlags, exit.FlagKey)
 	}

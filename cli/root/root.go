@@ -63,11 +63,11 @@ func (c *Command) Notify(stats runstat.Result) error {
 	}
 
 	// Read default set of notification types.
-	if len(conf.DefaultSet) == 0 {
-		conf.DefaultSet = append(conf.DefaultSet, "banner")
+	if len(conf.DefaultNotifications) == 0 {
+		conf.DefaultNotifications = append(conf.DefaultNotifications, "banner")
 	}
 
-	for _, sub := range conf.DefaultSet {
+	for _, sub := range conf.DefaultNotifications {
 		subCmd, found := c.Cmds[sub]
 		if !found {
 			log.Println("Unknown subcommand:", sub)

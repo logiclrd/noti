@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	Filename = ".noti.yaml"
+	configFile = ".noti.yaml"
 )
 
 func File() (Options, error) {
@@ -22,7 +22,7 @@ func File() (Options, error) {
 
 	var data []byte
 	for _, d := range ds {
-		data, err = ioutil.ReadFile(filepath.Join(d, Filename))
+		data, err = ioutil.ReadFile(filepath.Join(d, configFile))
 		if err == nil {
 			break
 		}

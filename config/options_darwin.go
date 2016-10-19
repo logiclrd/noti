@@ -7,7 +7,8 @@ import (
 )
 
 type Options struct {
-	DefaultSet []string
+	DefaultNotifications []string
+	DefaultTriggers []string
 	Banner     *nsuser.Notification
 	Speech     *say.Notification
 	Slack      *slack.Notification
@@ -15,7 +16,8 @@ type Options struct {
 
 func NewOptions() Options {
 	return Options{
-		DefaultSet: make([]string, 0),
+		DefaultNotifications: make([]string, 0),
+		DefaultTriggers: make([]string, 0),
 		Banner:     new(nsuser.Notification),
 		Speech:     new(say.Notification),
 		Slack:      new(slack.Notification),
