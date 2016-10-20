@@ -22,14 +22,12 @@ const (
 )
 
 func Run(trigFlags []string, args []string, notify func(runstat.Result) error) error {
-	conf, err := config.File()
-	if err != nil {
-		return err
+	if conf, err := config.File(); err == nil {
+		if len(trigFlags) == 0 {
+			trigFlags = append(trigFlags, conf.DefaultTriggers...)
+		}
 	}
 
-	if len(trigFlags) == 0 {
-		trigFlags = append(trigFlags, conf.DefaultTriggers...)
-	}
 	if len(trigFlags) == 0 {
 		trigFlags = append(trigFlags, exit.FlagKey)
 	}
