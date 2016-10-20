@@ -17,11 +17,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 * Notification types are now subcommands
 * Exposed more notification options
-* Library portion is now more generic
+* Notification packages are more general purpose
 
 ### Removed
 
 * Configuration by env vars
 * Single letter notification type flags
+
+### Fixed
+
+* macOS notifications are now more reliable
+* Improved behavior when clicking on macOS notifications
 
 [Unreleased]: https://github.com/variadico/noti/compare/dev...v3
