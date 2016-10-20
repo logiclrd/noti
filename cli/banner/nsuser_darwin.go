@@ -97,6 +97,7 @@ func (c *Command) Run() error {
 		return nil
 	}
 
+	c.v.Println("Triggers:", c.flag.Triggers)
 	return triggers.Run([]string(c.flag.Triggers), c.flag.Args(), c.Notify)
 }
 

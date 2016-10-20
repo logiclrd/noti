@@ -26,8 +26,10 @@ func Run(trigFlags []string, args []string, notify func(runstat.Result) error) e
 	if err != nil {
 		return err
 	}
-	trigFlags = append(trigFlags, conf.DefaultTriggers...)
 
+	if len(trigFlags) == 0 {
+		trigFlags = append(trigFlags, conf.DefaultTriggers...)
+	}
 	if len(trigFlags) == 0 {
 		trigFlags = append(trigFlags, exit.FlagKey)
 	}
