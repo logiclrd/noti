@@ -29,8 +29,9 @@ func (n *Notification) Send() error {
 
 	fdn := conn.Object("org.freedesktop.Notifications", "/org/freedesktop/Notifications")
 
+	// 0 is a total magic number. ¯\_(ツ)_/¯
 	resp := fdn.Call(
-		"org.freedesktop.Notifications.Notify", dbus.FlagNoAutoStart,
+		"org.freedesktop.Notifications.Notify", 0,
 		n.AppName,
 		uint32(n.ReplacesID),
 		n.AppIcon,
