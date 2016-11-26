@@ -8,7 +8,10 @@ import (
 	"github.com/variadico/noti/runstat"
 )
 
-const FlagKey = "timeout"
+const (
+	FlagKey    = "timeout"
+	killStatus = 137
+)
 
 type Trigger struct {
 	stats runstat.Result
@@ -35,6 +38,7 @@ func (t *Trigger) Run(cmdErr chan error, stats chan runstat.Result) {
 	case <-time.After(t.dur):
 		t.stats.Err = errors.New("command timeout exceeded")
 		t.stats.Duration = time.Since(start)
+		t.stats.ExitStatus = killStatus
 		stats <- t.stats
 	}
 }

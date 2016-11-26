@@ -35,10 +35,13 @@ func (t *Trigger) Run(cmdErr chan error, stats chan runstat.Result) {
 
 	select {
 	case err := <-cmdErr:
-		if err != nil {
+		if err == nil {
+			t.stats.ExitStatus = 0
+		} else {
 			t.stats.Err = err
 			t.stats.ExitStatus = exitStatus(err)
 		}
+
 		t.stats.Duration = time.Since(start)
 		stats <- t.stats
 	case <-t.ctx.Done():
