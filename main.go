@@ -10,10 +10,20 @@ import (
 	"github.com/variadico/noti/cli/slack"
 	"github.com/variadico/noti/cli/speech"
 	"github.com/variadico/noti/cli/version"
+	"github.com/variadico/noti/config"
+	"github.com/variadico/yaml"
 )
 
 func main() {
 	log.SetFlags(0)
+
+	// Don't want user to run command, but fail to notify because of a syntax
+	// error. Tell users now, so they don't wait.
+	if _, err := config.File(); err != nil {
+		if yerr, is := err.(*yaml.TypeError); is {
+			log.Fatalln("Config file error:", yerr)
+		}
+	}
 
 	noti := root.NewCommand().(*root.Command)
 	if err := noti.Parse(os.Args[1:]); err != nil {
