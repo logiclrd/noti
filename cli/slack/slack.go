@@ -7,7 +7,7 @@ import (
 
 	"github.com/variadico/noti/cli"
 	"github.com/variadico/noti/config"
-	"github.com/variadico/noti/ntypes/slack"
+	"github.com/variadico/noti/services/slack"
 	"github.com/variadico/noti/runstat"
 	"github.com/variadico/noti/triggers"
 	"github.com/variadico/vbs"

@@ -4,9 +4,9 @@
 package config
 
 import (
-	"github.com/variadico/noti/ntypes/espeak"
-	"github.com/variadico/noti/ntypes/freedesktop"
-	"github.com/variadico/noti/ntypes/slack"
+	"github.com/variadico/noti/services/espeak"
+	"github.com/variadico/noti/services/freedesktop"
+	"github.com/variadico/noti/services/slack"
 )
 
 type Options struct {

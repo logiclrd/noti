@@ -9,8 +9,8 @@ help. If you have any questions, feel free to ask on [Gitter].
 
 ## Create a notification type
 
-* Create a general notification package in `ntypes`.
-* At minimum, you must implement `ntypes.Notification`.
+* Create a general notification package in `services`.
+* At minimum, you must implement `services.Notification`.
 
 * Create a subcommand in `cli`. (Use existing packages as examples.)
 * Add command to `main.go`.

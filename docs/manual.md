@@ -19,9 +19,9 @@ zsh: suspended  sleep 10
 $ fg; noti
 ```
 
-## Notification types
+## Services
 
-There are different notification types that `noti` supports. Each type has
+There are different notification services that `noti` supports. Each type has
 different flags.
 
 ```

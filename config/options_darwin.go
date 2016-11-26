@@ -1,9 +1,9 @@
 package config
 
 import (
-	"github.com/variadico/noti/ntypes/nsuser"
-	"github.com/variadico/noti/ntypes/say"
-	"github.com/variadico/noti/ntypes/slack"
+	"github.com/variadico/noti/services/nsuser"
+	"github.com/variadico/noti/services/say"
+	"github.com/variadico/noti/services/slack"
 )
 
 type Options struct {
