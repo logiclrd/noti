@@ -1,7 +1,7 @@
 # Contributing
 
 Thanks for being interested in contributing! Here's some things you can do to
-help.
+help. If you have any questions, feel free to ask on [Gitter].
 
 * Create issues.
 * Add a new notification type.
@@ -33,3 +33,4 @@ You must branch off `dev`. I only put working, tested code on `master`.
 * `git push fork dev`
 * Open pull request
 
+[Gitter]: https://gitter.im/variadico/noti
