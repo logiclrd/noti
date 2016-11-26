@@ -13,7 +13,7 @@
 			"importpath": "github.com/variadico/yaml",
 			"repository": "https://github.com/variadico/yaml",
 			"vcs": "git",
-			"revision": "63333a9c03f8a312c01ba72f0298b0827ca95e1f",
+			"revision": "94a212e9d788f610608990458cf9d7ed6b030cf4",
 			"branch": "v2",
 			"notests": true
 		}

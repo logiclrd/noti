@@ -148,7 +148,7 @@ func Marshal(in interface{}) (out []byte, err error) {
 func handleErr(err *error) {
 	if v := recover(); v != nil {
 		if e, ok := v.(yamlError); ok {
-			*err = e.err
+			*err = &TypeError{[]string{e.err.Error()}}
 		} else {
 			panic(v)
 		}
