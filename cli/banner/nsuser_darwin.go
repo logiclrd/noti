@@ -6,10 +6,11 @@ import (
 
 	"github.com/variadico/noti/cli"
 	"github.com/variadico/noti/config"
-	"github.com/variadico/noti/services/nsuser"
 	"github.com/variadico/noti/runstat"
+	"github.com/variadico/noti/services/nsuser"
 	"github.com/variadico/noti/triggers"
 	"github.com/variadico/vbs"
+	"github.com/variadico/yaml"
 )
 
 var cmdDefault = &nsuser.Notification{
@@ -35,7 +36,9 @@ func (c *Command) Parse(args []string) error {
 
 func (c *Command) Notify(stats runstat.Result) error {
 	conf, err := config.File()
-	if err != nil {
+	if yerr, is := err.(*yaml.TypeError); is {
+		return yerr
+	} else if err != nil {
 		c.v.Println(err)
 	} else {
 		c.v.Println("Found config file")
