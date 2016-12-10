@@ -6,21 +6,20 @@ import (
 	"github.com/variadico/noti/cli"
 	"github.com/variadico/noti/config"
 	"github.com/variadico/noti/runstat"
-	"github.com/variadico/noti/services/say"
+	"github.com/variadico/noti/services/speechsynthesizer"
 	"github.com/variadico/noti/triggers"
 	"github.com/variadico/vbs"
 )
 
-var cmdDefault = &say.Notification{
-	Voice: "Alex",
+var cmdDefault = &speechsynthesizer.Notification{
 	Text:  "{{.Cmd}} done!",
-	Rate:  200,
+	Rate:  3,
 }
 
 type Command struct {
 	flag *cli.Flags
 	v    vbs.Printer
-	n    *say.Notification
+	n    *speechsynthesizer.Notification
 }
 
 func (c *Command) Parse(args []string) error {
@@ -40,7 +39,7 @@ func (c *Command) Notify(stats runstat.Result) error {
 		c.v.Println("Found config file")
 	}
 
-	fromFlags := new(say.Notification)
+	fromFlags := new(speechsynthesizer.Notification)
 
 	if c.flag.Passed("message", "m") {
 		fromFlags.Text = c.n.Text
@@ -63,7 +62,7 @@ func (c *Command) Notify(stats runstat.Result) error {
 	config.EvalStringFields(fromFlags, stats)
 
 	c.v.Println("Merging")
-	merged := new(say.Notification)
+	merged := new(speechsynthesizer.Notification)
 	err = config.MergeFields(
 		merged,
 		cmdDefault,
@@ -94,7 +93,7 @@ func NewCommand() cli.NotifyCmd {
 	cmd := &Command{
 		flag: cli.NewFlags("speech"),
 		v:    vbs.New(),
-		n:    new(say.Notification),
+		n:    new(speechsynthesizer.Notification),
 	}
 
 	cmd.flag.SetStrings(&cmd.n.Text, "m", "message", cmdDefault.Text)
