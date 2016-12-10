@@ -25,7 +25,7 @@ There are different notification services that `noti` supports. Each type has
 different flags.
 
 ```
-noti banner ls
+noti desktop ls
 noti slack ls
 ```
 
@@ -39,17 +39,17 @@ Finally, if one doesn't exist anywhere, `noti` will use baked-in defaults.
 
 ### File format
 
-The configuration file is standard YAML. This sets `banner` as my default
+The configuration file is standard YAML. This sets `desktop` as my default
 notification and `exit` as the trigger. You can also see that I've customized
-what information the Banner notification displays.
+what information the Desktop notification displays.
 
 ```
 ---
 DefaultNotifications:
-    - banner
+    - desktop
 DefaultTriggers:
     - exit
-Banner:
+Desktop:
     Title: "Command: {{.Cmd}}"
     Subtitle: "Arguments: {{.Args}}"
     InformativeText: "Duration: {{.Duration}}"

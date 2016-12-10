@@ -4,6 +4,6 @@ import "github.com/variadico/noti/services/slack"
 
 type Options struct {
 	DefaultSet []string
-	Banner     *notifyicon.Notification
+	Desktop     *notifyicon.Notification
 	Slack      *slack.Notification
 }

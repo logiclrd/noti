@@ -27,7 +27,7 @@ func (t *Trigger) Run(cmdErr chan error, stats chan runstat.Result) {
 	start := time.Now()
 
 	if t.stats.Cmd == "" {
-		// User executed something like, "noti" or "noti banner", meaning
+		// User executed something like, "noti" or "noti desktop", meaning
 		// without a utility argument to run.
 		stats <- runstat.Result{Cmd: "noti"}
 		return

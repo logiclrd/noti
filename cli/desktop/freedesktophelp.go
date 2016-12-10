@@ -1,9 +1,9 @@
 // +build !darwin
 // +build !windows
 
-package banner
+package desktop
 
-var helpText = `noti banner [options] [command]
+var helpText = `noti desktop [options] [command]
 
 OPTIONS
     -t, -title

@@ -22,7 +22,7 @@ OPTIONS
         Show help.
 
 NOTIFICATIONS
-    banner
+    desktop
     slack
     speech
 `

@@ -1,28 +1,29 @@
-package banner
+// +build !darwin
+// +build !windows
+
+package desktop
 
 import (
 	"fmt"
-	"runtime"
 
 	"github.com/variadico/noti/cli"
 	"github.com/variadico/noti/config"
 	"github.com/variadico/noti/runstat"
-	"github.com/variadico/noti/services/nsuser"
+	"github.com/variadico/noti/services/freedesktop"
 	"github.com/variadico/noti/triggers"
 	"github.com/variadico/vbs"
-	"github.com/variadico/yaml"
 )
 
-var cmdDefault = &nsuser.Notification{
-	Title:           "{{.Cmd}}",
-	InformativeText: "Done!",
-	SoundName:       "Ping",
+var cmdDefault = &freedesktop.Notification{
+	Summary:       "{{.Cmd}}",
+	Body:          "Done!",
+	ExpireTimeout: 500,
 }
 
 type Command struct {
 	flag *cli.Flags
 	v    vbs.Printer
-	n    *nsuser.Notification
+	n    *freedesktop.Notification
 }
 
 func (c *Command) Parse(args []string) error {
@@ -36,47 +37,48 @@ func (c *Command) Parse(args []string) error {
 
 func (c *Command) Notify(stats runstat.Result) error {
 	conf, err := config.File()
-	if yerr, is := err.(*yaml.TypeError); is {
-		return yerr
-	} else if err != nil {
+	if err != nil {
 		c.v.Println(err)
 	} else {
 		c.v.Println("Found config file")
 	}
 
-	fromFlags := new(nsuser.Notification)
+	fromFlags := new(freedesktop.Notification)
 
 	if c.flag.Passed("title", "t") {
-		fromFlags.Title = c.n.Title
-	}
-	if c.flag.Passed("subtitle") {
-		fromFlags.Subtitle = c.n.Subtitle
+		fromFlags.Summary = c.n.Summary
 	}
 	if c.flag.Passed("message", "m") {
-		fromFlags.InformativeText = c.n.InformativeText
+		fromFlags.Body = c.n.Body
+	}
+	if c.flag.Passed("app-name") {
+		fromFlags.AppName = c.n.AppName
+	}
+	if c.flag.Passed("replaces-id") {
+		fromFlags.ReplacesID = c.n.ReplacesID
 	}
 	if c.flag.Passed("icon") {
-		fromFlags.ContentImage = c.n.ContentImage
+		fromFlags.AppIcon = c.n.AppIcon
 	}
-	if c.flag.Passed("sound") {
-		fromFlags.SoundName = c.n.SoundName
+	if c.flag.Passed("timeout") {
+		fromFlags.ExpireTimeout = c.n.ExpireTimeout
 	}
 
 	c.v.Println("Evaluating")
 	c.v.Printf("Default: %+v\n", cmdDefault)
-	c.v.Printf("Config: %+v\n", conf.Banner)
+	c.v.Printf("Config: %+v\n", conf.Desktop)
 	c.v.Printf("Flags: %+v\n", fromFlags)
 
 	config.EvalStringFields(cmdDefault, stats)
-	config.EvalStringFields(conf.Banner, stats)
+	config.EvalStringFields(conf.Desktop, stats)
 	config.EvalStringFields(fromFlags, stats)
 
 	c.v.Println("Merging")
-	merged := new(nsuser.Notification)
+	merged := new(freedesktop.Notification)
 	err = config.MergeFields(
 		merged,
 		cmdDefault,
-		conf.Banner,
+		conf.Desktop,
 		fromFlags,
 	)
 	if err != nil {
@@ -91,32 +93,28 @@ func (c *Command) Notify(stats runstat.Result) error {
 }
 
 func (c *Command) Run() error {
-	c.v.Println("Locking OS thread")
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
 	if c.flag.Help {
 		fmt.Println(helpText)
 		return nil
 	}
 
-	c.v.Println("Triggers:", c.flag.Triggers)
 	return triggers.Run([]string(c.flag.Triggers), c.flag.Args(), c.Notify)
 }
 
 func NewCommand() cli.NotifyCmd {
 	cmd := &Command{
-		flag: cli.NewFlags("banner"),
+		flag: cli.NewFlags("desktop"),
 		v:    vbs.New(),
-		n:    new(nsuser.Notification),
+		n:    new(freedesktop.Notification),
 	}
 
-	cmd.flag.SetStrings(&cmd.n.Title, "t", "title", cmdDefault.Title)
-	cmd.flag.SetStrings(&cmd.n.InformativeText, "m", "message", cmdDefault.InformativeText)
+	cmd.flag.SetStrings(&cmd.n.Summary, "t", "title", cmdDefault.Summary)
+	cmd.flag.SetStrings(&cmd.n.Body, "m", "message", cmdDefault.Body)
 
-	cmd.flag.SetString(&cmd.n.Subtitle, "subtitle", cmdDefault.Subtitle)
-	cmd.flag.SetString(&cmd.n.ContentImage, "icon", cmdDefault.ContentImage)
-	cmd.flag.SetString(&cmd.n.SoundName, "sound", cmdDefault.SoundName)
+	cmd.flag.SetString(&cmd.n.AppName, "app-name", cmdDefault.AppName)
+	cmd.flag.SetUint(&cmd.n.ReplacesID, "replaces-id", cmdDefault.ReplacesID)
+	cmd.flag.SetString(&cmd.n.AppIcon, "icon", cmdDefault.AppIcon)
+	cmd.flag.SetInt(&cmd.n.ExpireTimeout, "timeout", cmdDefault.ExpireTimeout)
 
 	return cmd
 }

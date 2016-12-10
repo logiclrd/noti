@@ -71,7 +71,7 @@ func (c *Command) Notify(stats runstat.Result) error {
 
 	// Read default set of notification types.
 	if len(conf.DefaultNotifications) == 0 {
-		conf.DefaultNotifications = append(conf.DefaultNotifications, "banner")
+		conf.DefaultNotifications = append(conf.DefaultNotifications, "desktop")
 	}
 
 	for _, sub := range conf.DefaultNotifications {
