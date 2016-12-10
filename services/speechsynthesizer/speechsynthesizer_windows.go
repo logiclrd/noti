@@ -1,9 +1,11 @@
 package speechsynthesizer
 
-import "bytes"
-import "text/template"
-import "os/exec"
-import "os"
+import (
+	"bytes"
+	"os"
+	"os/exec"
+	"text/template"
+)
 
 const script = `
 Add-Type -AssemblyName System.speech
@@ -42,4 +44,3 @@ func (n *Notification) Send() error {
 
 	return cmd.Run()
 }
-

@@ -19,7 +19,7 @@ func NewOptions() Options {
 		DefaultNotifications: make([]string, 0),
 		DefaultTriggers:      make([]string, 0),
 		Desktop:              new(notifyicon.Notification),
-		Speech:              new(speechsynthesizer.Notification),
+		Speech:               new(speechsynthesizer.Notification),
 		Slack:                new(slack.Notification),
 	}
 }

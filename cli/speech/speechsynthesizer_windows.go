@@ -12,8 +12,8 @@ import (
 )
 
 var cmdDefault = &speechsynthesizer.Notification{
-	Text:  "{{.Cmd}} done!",
-	Rate:  3,
+	Text: "{{.Cmd}} done!",
+	Rate: 3,
 }
 
 type Command struct {
