@@ -27,7 +27,6 @@ $n.BalloonTipText = "{{.BalloonTipText}}"
 $n.BalloonTipTitle = "{{.BalloonTipTitle}}"
 $n.Text = "{{.Text}}"
 
-# $n.Visible = {{.Visible}}
 $n.Visible = $True
 $n.ShowBalloonTip({{.Duration}})
 `
@@ -48,13 +47,13 @@ type Notification struct {
 	// Text is the text shown when you hover over the app icon.
 	Text string
 
-	// Visible  string
-
 	Duration int
 }
 
 func (n *Notification) Send() error {
-	if n.Icon != DefaultIcon {
+	if n.Icon == "" {
+		n.Icon = DefaultIcon
+	} else {
 		n.Icon = fmt.Sprintf("%q", n.Icon)
 	}
 
@@ -67,8 +66,6 @@ func (n *Notification) Send() error {
 	if err := tmpl.Execute(buf, n); err != nil {
 		return err
 	}
-
-	// n.Visible = "$True"
 
 	cmd := exec.Command("PowerShell", "-Command", buf.String())
 	cmd.Stdout = os.Stdout

@@ -14,7 +14,7 @@ import (
 var cmdDefault = &notifyicon.Notification{
 	BalloonTipTitle: "{{.Cmd}}",
 	BalloonTipText:  "Done!",
-	BalloonTipIcon:  "Info",
+	BalloonTipIcon:  notifyicon.BalloonTipIconInfo,
 }
 
 type Command struct {
