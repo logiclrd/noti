@@ -18,6 +18,7 @@ var cmdDefault = &freedesktop.Notification{
 	Summary:       "{{.Cmd}}",
 	Body:          "Done!",
 	ExpireTimeout: 500,
+	AppIcon:       "utilities-terminal",
 }
 
 type Command struct {
