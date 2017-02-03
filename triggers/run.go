@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/variadico/noti/runstat"
 	"github.com/variadico/noti/triggers/exit"
 	"github.com/variadico/noti/triggers/match"
+	"github.com/variadico/noti/triggers/pid"
 	"github.com/variadico/noti/triggers/timeout"
 )
 
@@ -57,6 +59,13 @@ func Run(trigFlags []string, args []string, notify func(runstat.Result) error) e
 			}
 
 			trigs = append(trigs, timeout.NewTrigger(ctx, sts, d))
+		case pid.FlagKey:
+			id, err := strconv.Atoi(val)
+			if err != nil {
+				return err
+			}
+
+			trigs = append(trigs, pid.NewTrigger(ctx, sts, id))
 		default:
 			return fmt.Errorf("unknown trigger: %s", name)
 		}
