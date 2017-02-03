@@ -1,21 +1,6 @@
-package speech
+package triggers
 
-import (
-	"github.com/variadico/noti/cli"
-	"github.com/variadico/noti/triggers"
-)
-
-var helpText = `noti speech [options] [command]
-
-OPTIONS
-    -m, -message
-        Notification message. Default is "Done!"
-
-    -rate
-        Rate of speech.
-    -voice
-        Voice used to speak.
-
+const Usage = `
     -trigger 'mode[=value]'
         Set notification trigger. You can set this flag multiple times to set
         multiple triggers.
@@ -28,4 +13,8 @@ OPTIONS
         timeout=<duration>
             Trigger a notification and kill the running command after a certain
             duration.
-` + triggers.Usage + cli.GlobalUsage
+        pid=<process id>
+            Trigger a notification when a pid disappears. If the pid doesn't
+            exist or this trigger isn't supported, then the notification will
+            trigger immediately.
+`
