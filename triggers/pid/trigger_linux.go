@@ -12,15 +12,12 @@ import (
 )
 
 func (t *Trigger) Run(cmdErr chan error, stats chan runstat.Result) {
-	fmt.Println("running pid!")
-
 	for {
 		select {
 		case <-t.ctx.Done():
 			return
 		default:
 			// Check if PID exists.
-			fmt.Println("check if exists")
 
 			// os.FindProcess is unreliable. It won't return an error if the
 			// pid doesn't exist.
