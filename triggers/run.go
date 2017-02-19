@@ -55,14 +55,14 @@ func Run(trigFlags []string, args []string, notify func(runstat.Result) error) e
 		case timeout.FlagKey:
 			d, err := time.ParseDuration(val)
 			if err != nil {
-				return err
+				return fmt.Errorf("timeout trigger: %s", err)
 			}
 
 			trigs = append(trigs, timeout.NewTrigger(ctx, sts, d))
 		case pid.FlagKey:
 			id, err := strconv.Atoi(val)
 			if err != nil {
-				return err
+				return fmt.Errorf("pid trigger: %s", err)
 			}
 
 			trigs = append(trigs, pid.NewTrigger(ctx, sts, id))
