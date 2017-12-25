@@ -8,48 +8,15 @@ just writing this down for myself.
 * CHANGELOG.md
 * README.md
 
-## Run tests
+## Run notirelease
 
-```
-cd variadico/noti
-make install
-make test
-```
-
-Make sure CI is green.
-
-## Merge to master
-
-```shell
-git checkout master
-git merge dev --ff-only
-
-make install
-make test
-
-git push origin master
-
-# Last chance to make sure everything looks right, URLs resolve correctly.
-
-git tag 1.2.3
-git push origin 1.2.3
-```
+Follow the prompts. You'll end up with 3 release tarballs.
 
 ## Edit GitHub release information
 
 * Click on Releases > 1.2.3 > Edit tag.
 * Make the release title 1.2.3.
 * Copy and paste the changes from `CHANGELOG.md` into the description box.
-
-Create binaries.
-
-```shell
-docker run --rm -it -v $HOME/go:/go golang:latest /bin/bash
-
-cd /go/src/github.com/variadico/noti
-make unit-only
-make release
-```
 
 Upload binaries.
 
