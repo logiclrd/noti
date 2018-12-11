@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/variadico/noti/internal/command"
+	"github.com/logiclrd/noti/internal/command"
 )
 
 func main() {
